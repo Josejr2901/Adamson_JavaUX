@@ -849,7 +849,7 @@ public class SignUp {
                 }
             }
             reader.close(); // Close the reader after processing
-        } catch (IOException e) { 
+        } catch (IOException e) {
             e.printStackTrace(); 
         }
         return false; // Username not found, so it is not taken
