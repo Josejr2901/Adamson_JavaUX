@@ -19,18 +19,18 @@ import java.awt.event.MouseEvent; // Represents a mouse event (e.g., clicks, mov
 import java.io.*; // Includes all Java I/O classes for reading files, streams, and handling exceptions 
 
 // Importing Base64 encoding and decoding utility
-import java.util.Base64; // Provides methods for encoding and decoding Base64 data, commonly used in encryption 
+import java.util.Base64; // Provides methods for encoding and decoding Base64 data, commonly used in encryption  f
 
 // Importing collections framework
-import java.util.HashMap; //
+import java.util.HashMap; // Implements a data structure for storing key-value pairs
 
 // Importing cryptographic classes for encryption and decryption
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Cipher; // Provides encryption and decryption functionality 
+import javax.crypto.spec.SecretKeySpec; // Represents a secret key for symetric encryption 
 
 // Importing document change event listener for hundling text input changes
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent; // Represents changes in a document (e.g., text input)
+import javax.swing.event.DocumentListener; // Listens for document changes and reacts accordingly
 
 // Definition of the ResetPasswordFromProfilePage class
 public class ResetPasswordFromProfilePage {

@@ -62,7 +62,7 @@ public class SignUp {
         //  Constructor for SignUp class
         public SignUp(MainPage mainPage) {
             this.mainPage = mainPage; // Initialize reference
-            frame = new JFrame();
+            frame = new JFrame(); 
             frame.setTitle("Sign Up to ADAMSON AI");
             ImageIcon image = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\adamson-logo.png"); // Load icon for app
             visible = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\visible1.png"); // Load Icon for password visibility toggle
@@ -123,7 +123,7 @@ public class SignUp {
                         usernameIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\CorrectGold.png"));
                     }
                 }
-                
+                 
                 // Method to get validation status of the entered username
                 private String getUsernameStatus() {
                     String usernameStatus = usernameTxt.getText().trim();
