@@ -64,7 +64,7 @@ public class securityQuestionDeleteProfile {
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
 
     // Constructor method for the deleting a user profile with a security question
-    public securityQuestionDeleteProfile(User user) {
+    public securityQuestionDeleteProfile(User user) { 
         
         loadLockStatus(); // Load the lock status of the user account to check if account is temporaly blocked
         

@@ -19,10 +19,10 @@ import java.awt.event.MouseEvent; // Represents a mouse event (e.g., clicks, mov
 import java.io.*; // Includes all Java I/O classes for reading files, streams, and handling exceptions 
 
 // Importing Base64 encoding and decoding utility
-import java.util.Base64; // Provides methods for encoding and decoding Base64 data, commonly used in encryption  f
+import java.util.Base64; // Provides methods for encoding and decoding Base64 data, commonly used in encryption 
 
 // Importing collections framework
-import java.util.HashMap; // Implements a data structure for storing key-value pairs
+import java.util.HashMap; // Implements a data structure for storing key-value pairss
 
 // Importing cryptographic classes for encryption and decryption
 import javax.crypto.Cipher; // Provides encryption and decryption functionality 
@@ -134,13 +134,12 @@ public class ResetPasswordFromProfilePage {
                 String ansStatus = securityAnswerTxt.getText().trim(); // Get the trimmed text input 
                 
                 // Check if input matches the stored security answer or not
-                if (!ansStatus.equals(securityQuestionAnswer)) {  
+                if (!ansStatus.equals(securityQuestionAnswer)) {
                     return "Incorrect answer!"; // Return null if input does not match the stored security answer
                 }
                 return null; // Return null if the input security answer is correct
-            }
-            
-        });
+            }            
+        }); 
          
         // Creating the security answer validation icon label
         answerIcon = new JLabel();
@@ -272,6 +271,7 @@ public class ResetPasswordFromProfilePage {
                 new EditProfilePage(user);
             }
         });
+        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         /* These key listeners will automatically trigger the resetPasswordButton button if the Enter key is pressed in the keyboard */
