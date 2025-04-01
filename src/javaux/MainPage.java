@@ -5,7 +5,7 @@ package javaux;
 //import java.awt.Color; // Allows setting colors for UI components
 //import java.awt.Cursor; // Enables changing the mouse cursor appearance
 //import java.awt.Font; // Enables changing the mouse cursor appereance
-import java.awt.*; // Importing all AWT classes for UI custumazation and event handling
+import java.awt.*; /* Importing all AWT classes for UI custumazation and event handling */
 
 /* Importing event handling classes */
 //import java.awt.event.ActionEvent; // Represents an action event (ex. Button clicks)
@@ -14,13 +14,13 @@ import java.awt.*; // Importing all AWT classes for UI custumazation and event h
 //import java.awt.event.KeyEvent; // Rrepresents a key event (ex. Key presses)
 //import java.awt.event.MouseAdapter; // Provides default implementation for handling mouse events
 //import java.awt.event.MouseEvent; // Represents a mouse event (ex. clicks, movment)
-import java.awt.event.*; // Import all event handling classes 
+import java.awt.event.*; /* Import all event handling classes */
 
 
 /* Importing collections */
 //import java.util.HashMap; // Implements a data structure for storing key-value pairs
 //import java.util.Map; // Defines an interface for a key-value pair collections
-import java.util.*; // Import all collections
+import java.util.*; /* Import all collections */
 
 /* Importing Swing components for GUI */
 //import javax.swing.BorderFactory;  // Creates borders for UI elements
@@ -33,12 +33,12 @@ import java.util.*; // Import all collections
 //import javax.swing.JTextField; // A standart text input field
 //import javax.swing.ImageIcon; // Loads and displays images in UI components
 //import javax.swing.SwingConstants; // Provides constants for UI alignment (ex. CENTER, LEFT)
-import javax.swing.*; // Importing all java swing components for creating Graphical User Interface (GUI)
+import javax.swing.*; /* Importing all java swing components for creating Graphical User Interface (GUI) */
 
 /* Importing classes for handling document changes in text fields */
 //import javax.swing.event.DocumentEvent; // Represents changes in a document (ex. text input)
 //import javax.swing.event.DocumentListener; // Listens for document changes and react accordingly 
-import javax.swing.event.*; // Import all classes for handling document changes in text fields
+import javax.swing.event.*; /* Import all classes for handling document changes in text fields */
 
 /* Importing file handling and I/O operations */
 //import java.io.BufferedReader; // Reads text from a file efficiency 
@@ -47,12 +47,12 @@ import javax.swing.event.*; // Import all classes for handling document changes 
 //import java.io.BufferedWriter; // Writes text to a file efficiency
 //import java.io.File; // Represents file and directory pathnames
 //import java.io.IOException;
-import java.io.*; // Import all file handling I/O operations
+import java.io.*; /* Import all file handling I/O operations */
 
 /* Importing classes for file manipulation using the NIO package */
 //import java.nio.file.Files; // Provides utility methods for a file operations (ex. read, write, delete)
 //import java.nio.file.Paths; // Represents file paths in a system-indeoendent member 
-import java.nio.file.*; // Import all classes for file manipulation using the NIO package
+import java.nio.file.*; /* Import all classes for file manipulation using the NIO package */
 
 /* Importing cryptographic classes for encryption and decryption */
 import javax.crypto.Cipher; // Provides encryption and decryption functionality
@@ -482,7 +482,7 @@ public class MainPage extends Buttons {
                 } else {
                     // If the password is incorrect but the maximum attempts have not been reached yet
                     JOptionPane.showMessageDialog(frame, "Invalid Password. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts), "Warning", JOptionPane.WARNING_MESSAGE);
-                } 
+                }
             }
                 else { // This statement is in case both the username and password entered by the user are correct and do exist in the HashMap
                     failedAttempts = 0; // Reset count of failed Attempts to 0 when the login is successful 
@@ -504,7 +504,7 @@ public class MainPage extends Buttons {
                     new SecurityQuestionLogInPage(user);
                     frame.dispose();
                 }
-            }            
+            }
          
         // Function to save the lock status of an account. This is to preserve the lockout information even after the program is closed
         private void saveLockStatus(String username, long blockTime) {
@@ -513,7 +513,7 @@ public class MainPage extends Buttons {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }        
+        }
     }
 
     // Method to check if the account is currently blocked due to too many failed login attempts

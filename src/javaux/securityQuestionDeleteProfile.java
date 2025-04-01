@@ -34,10 +34,6 @@ import java.util.HashMap; // Implements a data structure for storing key-value p
 import javax.crypto.Cipher; // Provides encryption and decryption functionality
 import javax.crypto.spec.SecretKeySpec; // Defines a secret key for encryption algorithms
 
-// Importing Swing components for creating a graphical user interface (GUI)
-import javax.crypto.Cipher; // Provides encryption and decryption functionality
-import javax.crypto.spec.SecretKeySpec; // Defines a secret key for encryption algorithms
-
 // Importing Swing components for creating a graphical user interface (GUI
 import javax.swing.BorderFactory; // Creates border styles for UI elements
 import javax.swing.ImageIcon; // Handles icons and images in the UI
@@ -263,7 +259,7 @@ public class securityQuestionDeleteProfile {
                 source.setBackground(Color.decode("#876F4D")); // Set the background color of the button to khaki
                 source.setForeground(Color.WHITE); // Set the text color of the button to white
                 source.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1)); // Set the button border to white
-            }           
+            }
         };
         
         // Add same MouseAdapter (listener) to multiple buttons to apply behavior
