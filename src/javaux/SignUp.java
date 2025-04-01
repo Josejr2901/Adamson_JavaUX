@@ -4,7 +4,7 @@ package javaux;
 // Importing all Swing components for creating a graphical user interface (GUI)
 import javax.swing.*;// Includes all swing components such as JFrame, JButton, JLabel, etc.
 
-// Importing AWT classes for UI customization and event handling
+// Importing AWT(Abstract Window Toolkit) classes for UI customization and event handling
 import java.awt.*; // Includes core graphical components like Color, Font, and Cursor.
 
 // Importing even handling classes

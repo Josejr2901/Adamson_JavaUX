@@ -2,49 +2,57 @@
 package javaux;
 
 /* Importing classes for graphical user interface (GUI) components and styling */
-import java.awt.Color; // Allows setting colors for UI components
-import java.awt.Cursor; // Enables changing the mouse cursor appearance
-import java.awt.Font; // Enables changing the mouse cursor appereance
+//import java.awt.Color; // Allows setting colors for UI components
+//import java.awt.Cursor; // Enables changing the mouse cursor appearance
+//import java.awt.Font; // Enables changing the mouse cursor appereance
+import java.awt.*; // Importing all AWT classes for UI custumazation and event handling
 
 /* Importing event handling classes */
-import java.awt.event.ActionEvent; // Represents an action event (ex. Button clicks)
-import java.awt.event.ActionListener; // Listenes for action events and executes code in response
-import java.awt.event.KeyAdapter; // Provides default implementation for handling keyboard events
-import java.awt.event.KeyEvent; // Rrepresents a key event (ex. Key presses)
-import java.awt.event.MouseAdapter; // Provides default implementation for handling mouse events
-import java.awt.event.MouseEvent; // Represents a mouse event (ex. clicks, movment)
+//import java.awt.event.ActionEvent; // Represents an action event (ex. Button clicks)
+//import java.awt.event.ActionListener; // Listenes for action events and executes code in response
+//import java.awt.event.KeyAdapter; // Provides default implementation for handling keyboard events
+//import java.awt.event.KeyEvent; // Rrepresents a key event (ex. Key presses)
+//import java.awt.event.MouseAdapter; // Provides default implementation for handling mouse events
+//import java.awt.event.MouseEvent; // Represents a mouse event (ex. clicks, movment)
+import java.awt.event.*; // Import all event handling classes 
+
 
 /* Importing collections */
-import java.util.HashMap; // Implements a data structure for storing key-value pairs
-import java.util.Map; // Defines an interface for a key-value pair collections
+//import java.util.HashMap; // Implements a data structure for storing key-value pairs
+//import java.util.Map; // Defines an interface for a key-value pair collections
+import java.util.*; // Import all collections
 
 /* Importing Swing components for GUI */
-import javax.swing.BorderFactory;  // Creates borders for UI elements
-import javax.swing.JButton; // Represents a clickable button
-import javax.swing.JCheckBox; // Represents a checkbox for user selection
-import javax.swing.JFrame; // Represents the main window of the application
-import javax.swing.JLabel; // Displays text or images in the UI
-import javax.swing.JOptionPane; // Displays pop-up dialogs (ex. alerts, confirmation)
-import javax.swing.JPasswordField; // A text field that hides input (for passwords)
-import javax.swing.JTextField; // A standart text input field
-import javax.swing.ImageIcon; // Loads and displays images in UI components
-import javax.swing.SwingConstants; // Provides constants for UI alignment (ex. CENTER, LEFT)
+//import javax.swing.BorderFactory;  // Creates borders for UI elements
+//import javax.swing.JButton; // Represents a clickable button
+//import javax.swing.JCheckBox; // Represents a checkbox for user selection
+//import javax.swing.JFrame; // Represents the main window of the application
+//import javax.swing.JLabel; // Displays text or images in the UI
+//import javax.swing.JOptionPane; // Displays pop-up dialogs (ex. alerts, confirmation)
+//import javax.swing.JPasswordField; // A text field that hides input (for passwords)
+//import javax.swing.JTextField; // A standart text input field
+//import javax.swing.ImageIcon; // Loads and displays images in UI components
+//import javax.swing.SwingConstants; // Provides constants for UI alignment (ex. CENTER, LEFT)
+import javax.swing.*; // Importing all java swing components for creating Graphical User Interface (GUI)
 
 /* Importing classes for handling document changes in text fields */
-import javax.swing.event.DocumentEvent; // Represents changes in a document (ex. text input)
-import javax.swing.event.DocumentListener; // Listens for document changes and react accordingly 
+//import javax.swing.event.DocumentEvent; // Represents changes in a document (ex. text input)
+//import javax.swing.event.DocumentListener; // Listens for document changes and react accordingly 
+import javax.swing.event.*; // Import all classes for handling document changes in text fields
 
 /* Importing file handling and I/O operations */
-import java.io.BufferedReader; // Reads text from a file efficiency 
-import java.io.FileReader; // Reads text files line by line
-import java.io.FileWriter; // Writes text data to a file
-import java.io.BufferedWriter; // Writes text to a file efficiency
-import java.io.File; // Represents file and directory pathnames
-import java.io.IOException;
+//import java.io.BufferedReader; // Reads text from a file efficiency 
+//import java.io.FileReader; // Reads text files line by line
+//import java.io.FileWriter; // Writes text data to a file
+//import java.io.BufferedWriter; // Writes text to a file efficiency
+//import java.io.File; // Represents file and directory pathnames
+//import java.io.IOException;
+import java.io.*; // Import all file handling I/O operations
 
 /* Importing classes for file manipulation using the NIO package */
-import java.nio.file.Files; // Provides utility methods for a file operations (ex. read, write, delete)
-import java.nio.file.Paths; // Represents file paths in a system-indeoendent member
+//import java.nio.file.Files; // Provides utility methods for a file operations (ex. read, write, delete)
+//import java.nio.file.Paths; // Represents file paths in a system-indeoendent member 
+import java.nio.file.*; // Import all classes for file manipulation using the NIO package
 
 /* Importing cryptographic classes for encryption and decryption */
 import javax.crypto.Cipher; // Provides encryption and decryption functionality
