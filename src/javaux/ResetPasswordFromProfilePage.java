@@ -58,7 +58,7 @@ public class ResetPasswordFromProfilePage {
     public ResetPasswordFromProfilePage(User user) {
         
         /* Retrieve user detair from user object */
-        String username = user.getUsername(); // REtrieve the username from the user object
+        String username = user.getUsername(); // Retrieve the username from the user object
         String email = user.getEmail(); // Retrieve the email from the user object
         String securityQuestion = user.getQuestion(); // Retrieve the security question from the object
         String securityQuestionAnswer = user.getAnswer(); // Retrieve the security anser from the object
@@ -567,7 +567,8 @@ public class ResetPasswordFromProfilePage {
             
             // Combine IV and encrypted data (IV Must be known for decryption)
             byte[] combined = new byte[iv.length + encryptedBytes.length];
-            System.arraycopy(iv, 0, combined, iv.length, encryptedBytes.length);
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
             
             return Base64.getEncoder().encodeToString(combined);
         } catch (Exception e) {
