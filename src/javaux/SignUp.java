@@ -408,8 +408,7 @@ public class SignUp {
                     // Check if input contains only letters, numbers and spaces
                     if (!securityAnsStatus.matches("[a-zA-Z0-9 ]+")) {
                         return "Wrong format used!"; // Return error message if invalid characters are detected 
-                    }
-                    
+                    }                    
                     return null; // Return null if the input format is valid
                 }
             });
@@ -563,7 +562,7 @@ public class SignUp {
             
             confirmPasswordField.addKeyListener(new KeyAdapter() { // Add a key listener to the confirmPasswordField textfield
                 @Override
-                public void keyPressed(KeyEvent e) { 
+                public void keyPressed(KeyEvent e) {
                     if (e.getKeyCode() == KeyEvent.VK_ENTER) { // Check if Enter key is pressed
                         signUpButton.doClick(); // Simulate a click on the signup button
                     }

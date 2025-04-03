@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent; // Represents an action event (e.g., button c
 import java.awt.event.ActionListener; // Listens for and handles action events
 import java.awt.event.KeyAdapter; // Providesa default implementation for handling key events
 import java.awt.event.KeyEvent; // Represents key events (e.g., key presses)
-import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events 
+import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events
 import java.awt.event.MouseEvent; // Represents mouse events (e.g., clicks, movement)
 
 // Importing file handling and I/O operators
@@ -80,7 +80,7 @@ public class EditProfilePage {
     public EditProfilePage(User user) {
         
         /* Retrieve user details from the user object */
-        String username = user.getUsername(); // Retrieve the username from the user object
+        String userUsername = user.getUsername(); // Retrieve the username from the user object
         String userEmail = user.getEmail(); // Retrieve the email from the user object 
         String userBirthday = user.getBirthday(); // Retrieve the birthday from the user object
         String userGender = user.getGender(); // Retrieve the gender from thge user object
@@ -126,7 +126,7 @@ public class EditProfilePage {
         usernameLabel.setForeground(Color.WHITE);
         usernameLabel.setBounds(50, 120, 62, 20);
         
-        currentUsernameLabel = new JLabel(username);
+        currentUsernameLabel = new JLabel(userUsername);
         currentUsernameLabel.setForeground(Color.decode("#876F4D"));
         currentUsernameLabel.setBounds(120, 120, 140, 20); //x, y, width, height
         
@@ -499,7 +499,7 @@ public class EditProfilePage {
             if(maleButton.isSelected()) {
                 // Set male icon
                 genderIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\IconMaleGold16px.png"));
-            } 
+            }
             // Check if the female button is selected
             else if(femaleButton.isSelected()) {
                 // Set female icon
@@ -507,71 +507,7 @@ public class EditProfilePage {
             }
         }
     }
-    
-    private void deleteUserData(String encryptedEmail, String encryptedUsername) {
-        try {
-            // Open the original file and the temporary file
-            File file = new File("user_data.txt");
-            File tempFile = new File("user_data_temp.txt");
-
-            // Ensure that the temp file exists or create it
-            if (!tempFile.exists()) {
-                tempFile.createNewFile();
-            }
-
-            // Read from the original file and write to the temp file
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-
-            String line;
-            boolean foundUser = false;
-
-            // Read through each line in the original file
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 3) {
-                    // Check if the line matches the user to be deleted
-                    String storedEmail = parts[1].trim();
-                    String storedUsername = parts[0].trim();
-
-                    // Compare the encrypted email and username
-                    if (storedEmail.equals(encryptedEmail) && storedUsername.equals(encryptedUsername)) {
-                        foundUser = true;  // We found the user to delete
-                        continue;  // Skip writing this line to the temp file
-                    }
-                }
-
-                // Write the current line to the temp file if it doesn't match the user to delete
-                writer.write(line);
-                writer.newLine();
-            }
-
-            // Close the readers and writers
-            reader.close();
-            writer.close();
-
-            // If we found and deleted the user, replace the original file
-            if (foundUser) {
-                // Delete the original file and rename the temp file
-                if (file.delete()) {
-                    boolean renamed = tempFile.renameTo(file);
-                    if (!renamed) {
-                        throw new IOException("Failed to rename temp file to original file");
-                    }
-                    JOptionPane.showMessageDialog(frame, "Your account has been successfully deleted.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    throw new IOException("Failed to delete original file");
-                }
-            } else {
-                // If the user was not found, notify the user
-                JOptionPane.showMessageDialog(frame, "No matching account found to delete.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Error occurred while deleting account data.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-        
+            
     // Action listener for updating the username and email
     private class ResetInfoAction implements ActionListener {
         @Override
@@ -621,25 +557,27 @@ public class EditProfilePage {
                 }
             }
 
-            // Check if username format is valid
-            if (!newUsername.matches("[a-zA-Z0-9_]+")) {
-                JOptionPane.showMessageDialog(null, "'Username' not valid [No spaces, and use only alphanumeric values and/or '_']", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+//            // Check if username format is valid
+//            if (!newUsername.matches("[a-zA-Z0-9_]+")) {
+//                JOptionPane.showMessageDialog(null, "'Username' not valid [No spaces, and use only alphanumeric values and/or '_']", "Error", JOptionPane.ERROR_MESSAGE);
+//                return;
+//            }
 
             // Load existing users data
             HashMap<String, String> userData = loadUserData();
-            String encryptedCurrentEmail = encryptData(currentEmail); // Encrypt current email
-            String encryptedCurrentUsername = encryptData(currentUsername); // Encrypt current username
+//            String encryptedCurrentEmail = encryptData(currentEmail); // Encrypt current email
+//            String encryptedCurrentUsername = encryptData(currentUsername); // Encrypt current username
 
             // Combine current email and username to form the key
-            String key = encryptedCurrentEmail + ":" + encryptedCurrentUsername;
+            String key = currentEmail + ":" + currentUsername;
 
             // Check if the combined key exists in the user data map
             if (userData.containsKey(key)) {
                 // User found, update username and email
+                String encryptedCurrentEmail = encryptData(currentEmail);
                 String encryptedNewEmail = encryptData(newEmail);  // Encrypt new email
                 String encryptedNewUsername = encryptData(newUsername);  // Encrypt new username
+                String encryptedCurrentUsername = encryptData(currentUsername);
                 String encryptedNewBirthday = encryptData(newBirthday);
                 String encryptedNewGender = encryptData(newGender);
                 
@@ -651,16 +589,12 @@ public class EditProfilePage {
                 new MainPage(userData);  // Refresh the main page
             } else {
                 JOptionPane.showMessageDialog(frame, "Current username or email is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
-//                System.out.println("Encrypted current email: " + encryptedCurrentEmail);
-//                System.out.println("Encrypted current username: " + encryptedCurrentUsername);
-//                System.out.println("Key: " + key);
-
             }
         }
     }
  
     // Check if username already exists in the user data file
-        private boolean isUsernameTaken(String username) {
+        private boolean isUsernameTaken(String newUsername) {
             try {
                 // Open the file "user_data.txt" for reading
                 BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"));
@@ -668,7 +602,7 @@ public class EditProfilePage {
                 while ((line = reader.readLine()) != null) { // Read every line of the file
                     String[] userData = line.split(","); // Split every line by commas
                     String decryptedUsername = decryptData(userData[0]); // Decrypt the username(first field)
-                    if (decryptedUsername.equalsIgnoreCase(username)) { // Compare with input username
+                    if (decryptedUsername.equalsIgnoreCase(newUsername)) { // Compare with input username
                         reader.close();
                         return true; // Username already exists
                     }
@@ -681,7 +615,7 @@ public class EditProfilePage {
         }
         
         // Check if the email already exists in the user data file
-        private boolean isEmailTaken(String email) {
+        private boolean isEmailTaken(String newEmail) {
             try {
                 // Open the file "user_data.txt" for reading 
                 BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"));
@@ -689,7 +623,7 @@ public class EditProfilePage {
                 while ((line = reader.readLine()) != null) { // Read every line of the file
                     String[] userData = line.split(","); // Split every line by commas
                     String decryptedEmail = decryptData(userData[1]); // decrypt the email (second field)
-                    if (decryptedEmail.equalsIgnoreCase(email)) { // Compare with input email
+                    if (decryptedEmail.equalsIgnoreCase(newEmail)) { // Compare with input email
                         reader.close();
                         return true; // Username already exists
                     }
@@ -701,60 +635,125 @@ public class EditProfilePage {
             return false; // Username not found
         }
 
-    // Helper method to load user data from file
-    private HashMap<String, String> loadUserData() {
-        HashMap<String, String> userData = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 3) {
-                    String encryptedUsername = parts[0];  // Encrypted username
-                    String encryptedEmail = parts[1];  // Encrypted email
-                    // Storing username and email combination as the key with the rest of the line as value
-                    userData.put(encryptedEmail + ":" + encryptedUsername, line);
+//    // Helper method to load user data from file
+//    private HashMap<String, String> loadUserData() {
+//        HashMap<String, String> userData = new HashMap<>();
+//        try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split(",");
+//                if (parts.length >= 3) {
+//                    String encryptedUsername = parts[0];  // Encrypted username
+//                    String encryptedEmail = parts[1];  // Encrypted email
+//                    // Storing username and email combination as the key with the rest of the line as value
+//                    userData.put(encryptedEmail + ":" + encryptedUsername, line);
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return userData;
+//    }
+        
+        private HashMap<String, String> loadUserData() {
+            HashMap<String, String> userData = new HashMap<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 3) {
+                        String decryptedUsername = decryptData(parts[0]);
+                        String decryptedEmail = decryptData(parts[1]);
+                        userData.put(decryptedEmail + ":" + decryptedUsername, line);  
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return userData;
         }
-        return userData;
-    }
     
     
-    // Save the updated username and email to the file
-    private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, String encryptedCurrentUsername, 
-                                       String encryptedNewUsername, String encryptedNewBirthday, String encryptedNewGender) {
-        try {
-            // Read the old user data, and update the username and email for the given email and username
-            File file = new File("user_data.txt");
-            File tempFile = new File("user_data_temp.txt");
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+//    // Save the updated username and email to the file
+//    private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, String encryptedCurrentUsername, 
+//                                       String encryptedNewUsername, String encryptedNewBirthday, String encryptedNewGender) {
+//        try {
+//            // Read the old user data, and update the username and email for the given email and username
+//            File file = new File("user_data.txt");
+//            File tempFile = new File("user_data_temp.txt");
+//            BufferedReader reader = new BufferedReader(new FileReader(file));
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+//
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split(",");
+//                if (parts.length >= 3 && parts[0].equals(encryptedCurrentUsername) && parts[1].equals(encryptedCurrentEmail)) {
+//                    // Replace the username and email with the new values
+//                    writer.write(encryptedNewUsername + "," + encryptedNewEmail + "," + parts[2] + "," + parts[3] + "," + parts[4] + "," + encryptedNewBirthday + "," + encryptedNewGender);
+//                } else {
+//                    writer.write(line);
+//                }
+//                writer.newLine();
+//            }
+//
+//            reader.close();
+//            writer.close();
+//
+//            // Replace the original file with the updated one
+//            if (file.delete()) {
+//                tempFile.renameTo(file);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+        
+        
+        // Save the updated username and email to the file
+        private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, 
+                                       String encryptedCurrentUsername, String encryptedNewUsername, 
+                                       String encryptedNewBirthday, String encryptedNewGender) {
+            try {
+                File file = new File("user_data.txt");
+                File tempFile = new File("user_data_temp.txt");
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 3 && parts[0].equals(encryptedCurrentUsername) && parts[1].equals(encryptedCurrentEmail)) {
-                    // Replace the username and email with the new values
-                    writer.write(encryptedNewUsername + "," + encryptedNewEmail + "," + parts[2] + "," + parts[3] + "," + parts[4] + "," + encryptedNewBirthday + "," + encryptedNewGender);
-                } else {
-                    writer.write(line);
+                String currentUsername = currentUsernameLabel.getText().trim();  // Get current username from label
+                String currentEmail = currentEmailLabel.getText().trim();  // Get current email from label
+                
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 3) {
+                        // Decrypt stored username and email to compare them in plaintext
+                        String decryptedStoredUsername = decryptData(parts[0]);
+                        String decryptedStoredEmail = decryptData(parts[1]);
+
+                        if (decryptedStoredUsername.equals(currentUsername) && decryptedStoredEmail.equals(currentEmail)) {
+                            // Replace with new encrypted values
+                            writer.write(encryptedNewUsername + "," + encryptedNewEmail + "," + parts[2] + "," + parts[3] + "," + parts[4] + "," + encryptedNewBirthday + "," + encryptedNewGender);
+                         
+                        } else {
+                            writer.write(line); 
+                        }
+                    } else {
+                        writer.write(line);
+                    }
+                    writer.newLine();
                 }
-                writer.newLine();
-            }
 
-            reader.close();
-            writer.close();
+                reader.close();
+                writer.close();
 
-            // Replace the original file with the updated one
-            if (file.delete()) {
-                tempFile.renameTo(file);
+                if (file.delete()) {
+                    tempFile.renameTo(file);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
+    
     
      /* Encryption and decryption methods */
 
