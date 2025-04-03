@@ -1,18 +1,18 @@
  
 package javaux;
 
-// Import AWT classes for UI customization and event handling
+/* Import AWT classes for UI customization and event handling */
 import java.awt.Color; // Allows customization of UI component colors
 import java.awt.Cursor; // Enables changing the cursors appearance (e.g., hand cursor on hover)
 import java.awt.Font; // Manages font style and size for UI text rendering
 
-// Importing event handling classes
+/* Importing event handling classes */
 import java.awt.event.KeyAdapter; // Provides a default implementation for handling key events
 import java.awt.event.KeyEvent; // Represents key events (e.g., key presses)
 import java.awt.event.MouseAdapter; // Provides a deafult implementation for handling mouse events
 import java.awt.event.MouseEvent; // Represents mouse actions (e.g., clicks, movement)
 
-// Import file handling and I/O operations
+/* Import file handling and I/O operations */
 import java.io.BufferedReader; // Reads text from a file efficiently 
 import java.io.BufferedWriter; // Writes text to a file efficiently
 import java.io.File; // Represents a file or a directory path
@@ -20,21 +20,21 @@ import java.io.FileReader; // Read data from a file character by character
 import java.io.FileWriter; // Writes data to a file
 import java.io.IOException; // Handles exceptions related to input/output operations
 
-// Importing file manipulation utilities
+/* Importing file manipulation utilities */
 import java.nio.file.Files; // Provides methods for reading, writing, and manipulating files
 import java.nio.file.Paths; // Represents file paths in a system-independent way
 
-// Importing Base64 encoding and decoding utility
+/* Importing Base64 encoding and decoding utility */
 import java.util.Base64; // Provides methods for encoding and decoding Base64 data
 
-// Importing collections
+/* Importing collections */
 import java.util.HashMap; // Implements a data structure for storing key-value pairs 
 
-// Importing cryptographic classes for encryption and decryption
+/* Importing cryptographic classes for encryption and decryption */
 import javax.crypto.Cipher; // Provides encryption and decryption functionality
 import javax.crypto.spec.SecretKeySpec; // Defines a secret key for encryption algorithms
 
-// Importing Swing components for creating a graphical user interface (GUI
+/* Importing Swing components for creating a graphical user interface (GUI) */
 import javax.swing.BorderFactory; // Creates border styles for UI elements
 import javax.swing.ImageIcon; // Handles icons and images in the UI
 import javax.swing.JButton; // Represents a clickable button in the UI
@@ -272,8 +272,7 @@ public class securityQuestionDeleteProfile {
         frame.add(securityAnswerTxt);
         frame.add(confirmButton);
         frame.add(cancelButton);
-        frame.setVisible(true);
-        
+        frame.setVisible(true);        
     }
     
     // Method to check if the account is currently blocked due to too many failed login attempts
@@ -420,7 +419,7 @@ public class securityQuestionDeleteProfile {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } 
+        }
     }
 
     // Method to load the account lock status from a file

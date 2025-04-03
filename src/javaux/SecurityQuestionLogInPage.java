@@ -5,12 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.HashMap;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import java.nio.file.*;
+import java.util.*;
 
 public class SecurityQuestionLogInPage {
 

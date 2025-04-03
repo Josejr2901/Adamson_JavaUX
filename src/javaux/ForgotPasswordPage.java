@@ -9,6 +9,11 @@ import java.util.HashMap; // Import for using HashMap data structure
 import javax.crypto.Cipher; // Import for AES encryption and decryption
 import javax.crypto.spec.SecretKeySpec; // Import for specifying the AES encryption key
 
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.*;
+import java.security.SecureRandom;
+
 public class ForgotPasswordPage {
     
     // Declaring GUI components
@@ -19,6 +24,8 @@ public class ForgotPasswordPage {
     
     // Define a static secret key for AES encryption/decryption
     private static final String SECRET_KEY = "mysecretkey12345";
+    
+    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     
     // Constructor to initialize the forgot password page
     public ForgotPasswordPage() {
@@ -195,21 +202,45 @@ public class ForgotPasswordPage {
         frame.dispose(); // Close current frame
     }
     
-    // AES Decryption method, this will be used for decrypting any type of data stored in the text file already
-    private String decryptData(String encryptedData) {
+//    // AES Decryption method, this will be used for decrypting any type of data stored in the text file already
+//    private String decryptData(String encryptedData) {
+//        try {
+//            
+//            /* SECRET_KEY.getBytes() convertsw the string key into a byte array
+//               SecretKeySpec wraps this byte array into an objext that can be used by the AES algorithm
+//               This ensures that the same key is used for both encryption and decryption */
+//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");// Create an AES decryption key using the predefined SECRET_KEY 
+//            
+//            Cipher cipher = Cipher.getInstance("AES"); // Create a Cipher instance and confiure it for AES decryption 
+//            cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keySpec) tells the cipher to decrypt the data using the secret key
+//                                                                          
+//            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // convert the Base64-encoded string back into bytes, because since encrypted data was...
+//                                                                                               // ... stored as a Base64 string, we first decode it back into original encrypted nature                                                                                 
+//            return new String(decryptedBytes); // Decrypt te data and convert it back into a readable string before returning it
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+    
+    public static String decryptData(String encryptedData) {
         try {
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
             
-            /* SECRET_KEY.getBytes() convertsw the string key into a byte array
-               SecretKeySpec wraps this byte array into an objext that can be used by the AES algorithm
-               This ensures that the same key is used for both encryption and decryption */
-            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");// Create an AES decryption key using the predefined SECRET_KEY 
+            // Extract IV (first 16 bytes)
+            byte[] iv = new byte[16];
+            System.arraycopy(decodedBytes, 0, iv, 0, iv.length);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
             
-            Cipher cipher = Cipher.getInstance("AES"); // Create a Cipher instance and confiure it for AES decryption 
-            cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keySpec) tells the cipher to decrypt the data using the secret key
-                                                                          
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // convert the Base64-encoded string back into bytes, because since encrypted data was...
-                                                                                               // ... stored as a Base64 string, we first decode it back into original encrypted nature                                                                                 
-            return new String(decryptedBytes); // Decrypt te data and convert it back into a readable string before returning it
+            // Extract encrypted content
+            byte[] encryptedBytes = new byte[decodedBytes.length - iv.length];
+            System.arraycopy(decodedBytes, iv.length, encryptedBytes, 0, encryptedBytes.length);
+            
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            
+            return new String (cipher.doFinal(encryptedBytes));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

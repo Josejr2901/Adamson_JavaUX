@@ -50,6 +50,12 @@ import javax.swing.JRadioButton; // Represents a selectable radio button
 import javax.swing.JTextField; // Represents a single-line text input field
 import javax.swing.SwingConstants; // Provides constants for UI alignment
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.SecureRandom;
+import java.util.Base64;
+
 // Definition of the EditProfilePage class 
 public class EditProfilePage {
     
@@ -67,6 +73,8 @@ public class EditProfilePage {
     
     // AES key for encryption and decryption (same as before)
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
+    
+    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     
     // Constructor for the EditProfilePage class
     public EditProfilePage(User user) {
@@ -406,7 +414,7 @@ public class EditProfilePage {
 
             // Method triggered when the mouse button is released after being pressed. It updates the button's appearance back to its normal state
             @Override
-            public void mouseReleased(MouseEvent e) { 
+            public void mouseReleased(MouseEvent e) {
                 JButton source = (JButton) e.getSource(); // Get the button that was released
                 source.setBackground(Color.decode("#876F4D")); // Set the background color of the button to khaki
                 source.setForeground(Color.WHITE); // Set the text color of the button to white
@@ -497,7 +505,7 @@ public class EditProfilePage {
                 // Set female icon
                 genderIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\IconFemaleGold16px.png"));
             }
-        }        
+        }
     }
     
     private void deleteUserData(String encryptedEmail, String encryptedUsername) {
@@ -643,6 +651,10 @@ public class EditProfilePage {
                 new MainPage(userData);  // Refresh the main page
             } else {
                 JOptionPane.showMessageDialog(frame, "Current username or email is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
+//                System.out.println("Encrypted current email: " + encryptedCurrentEmail);
+//                System.out.println("Encrypted current username: " + encryptedCurrentUsername);
+//                System.out.println("Key: " + key);
+
             }
         }
     }
@@ -671,7 +683,7 @@ public class EditProfilePage {
         // Check if the email already exists in the user data file
         private boolean isEmailTaken(String email) {
             try {
-                // Open the file "user_data.txt" for reading
+                // Open the file "user_data.txt" for reading 
                 BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"));
                 String line;
                 while ((line = reader.readLine()) != null) { // Read every line of the file
@@ -709,6 +721,7 @@ public class EditProfilePage {
         return userData;
     }
     
+    
     // Save the updated username and email to the file
     private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, String encryptedCurrentUsername, 
                                        String encryptedNewUsername, String encryptedNewBirthday, String encryptedNewGender) {
@@ -742,56 +755,109 @@ public class EditProfilePage {
             e.printStackTrace();
         }
     }
-
     
-    // Mehod to encrypt the data, it is used to encrypt all the necessary data before storing them into a file
-    private String encryptData(String data) {
+     /* Encryption and decryption methods */
+
+    public static String encryptData(String data) {
         try {
-            /* SECRET_KEY.getBytes() converts the string key into a byte array
-               SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-               This ensures that the same key is used for both encryption and decryption */
-            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
+            // Generate a random IV
+            byte[] iv = new byte[16];
+            new SecureRandom().nextBytes(iv);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
             
-            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES Cipher instance for encryption mode
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPT_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
+            // AES Key Spec
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
-            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
-                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
-                                                                                // It takes the input data
-                                                                                // Uses the AES encryption algorithm with the given secret key.
-                                                                                // Returns an encrypted byte array
-                                                                                
-            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted bytes into Base64 string for easier storage
-                                                                       // AES encryption produces binary data (not readable). Therefore...
-                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
-        } catch (Exception e) {                                        
-                                                                       
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+            
+            // Combine IV and encrypted data (IV must be known for decryption)
+            byte[] combined = new byte[iv.length + encryptedBytes.length];
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
+            
+            return Base64.getEncoder().encodeToString(combined);            
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
     
-    // Method to decrypt data, it is used for decrypting any type of data stored in the text file already
-     private String decryptData(String encryptedData) {
-            try {
-                
-                /* SECRET_KEY.getBytes() converts the string key into a bute array
-                   SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-                   This ensures that the same key is used for both encryption and decryption */
-                SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES decryption 
-                
-                Cipher cipher = Cipher.getInstance("AES"); // Cerate a cipher and configure it for AES decryption //Same as encryption, but this time it will be set for decryption
-                cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keyspec) tells the cipher to decrypt the data using the secret key
-                
-                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // Convert the Base64-encoded string back into bytes, because since encrypted data was...
-                                                                                                   // ... stored as a Base64 string, we first decode it back into original encrypted nature
-                return new String(decryptedBytes); // Decrypt the data and convert it back into a readable string before returning it                                          
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+    // Decrypt method with IV
+    public static String decryptData(String encryptedData) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
+
+            // Extract IV (first 16 bytes)
+            byte[] iv = new byte[16];
+            System.arraycopy(decodedBytes, 0, iv, 0, iv.length);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            // Extract encrypted content 
+            byte[] encryptedBytes = new byte[decodedBytes.length - iv.length];
+            System.arraycopy(decodedBytes, iv.length, encryptedBytes, 0, encryptedBytes.length);
+
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+            return new String (cipher.doFinal(encryptedBytes));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
+    }
+    
+    
+//    // Mehod to encrypt the data, it is used to encrypt all the necessary data before storing them into a file
+//    private String encryptData(String data) {
+//        try {
+//            /* SECRET_KEY.getBytes() converts the string key into a byte array
+//               SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
+//               This ensures that the same key is used for both encryption and decryption */
+//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
+//            
+//            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES Cipher instance for encryption mode
+//            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPT_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
+//            
+//            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
+//                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
+//                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
+//                                                                                // It takes the input data
+//                                                                                // Uses the AES encryption algorithm with the given secret key.
+//                                                                                // Returns an encrypted byte array
+//                                                                                
+//            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted bytes into Base64 string for easier storage
+//                                                                       // AES encryption produces binary data (not readable). Therefore...
+//                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
+//        } catch (Exception e) {                                        
+//                                                                       
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+//    
+//    // Method to decrypt data, it is used for decrypting any type of data stored in the text file already
+//     private String decryptData(String encryptedData) {
+//            try {
+//                
+//                /* SECRET_KEY.getBytes() converts the string key into a bute array
+//                   SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
+//                   This ensures that the same key is used for both encryption and decryption */
+//                SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES decryption 
+//                
+//                Cipher cipher = Cipher.getInstance("AES"); // Cerate a cipher and configure it for AES decryption //Same as encryption, but this time it will be set for decryption
+//                cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keyspec) tells the cipher to decrypt the data using the secret key
+//                
+//                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // Convert the Base64-encoded string back into bytes, because since encrypted data was...
+//                                                                                                   // ... stored as a Base64 string, we first decode it back into original encrypted nature
+//                return new String(decryptedBytes); // Decrypt the data and convert it back into a readable string before returning it                                          
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }
      
     // Helper method to convert month number (1-12) to month afer 
     private static String getMonthName(int month) {

@@ -32,6 +32,9 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import javax.crypto.spec.*;
+import java.security.SecureRandom;
+
 // Definition of the ResetPasswordFromProfilePage class
 public class ResetPasswordFromProfilePage {
 
@@ -48,6 +51,8 @@ public class ResetPasswordFromProfilePage {
      
     // AES key for encryption and decryption (same as before)
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
+    
+    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     
     // Constructor for the ResetPasswordFromProfile class
     public ResetPasswordFromProfilePage(User user) {
@@ -134,12 +139,11 @@ public class ResetPasswordFromProfilePage {
                 String ansStatus = securityAnswerTxt.getText().trim(); // Get the trimmed text input 
                 
                 // Check if input matches the stored security answer or not
-                if (!ansStatus.equals(securityQuestionAnswer)) {  
+                if (!ansStatus.equals(securityQuestionAnswer)) {
                     return "Incorrect answer!"; // Return null if input does not match the stored security answer
                 }
                 return null; // Return null if the input security answer is correct
-            }
-            
+            }            
         });
          
         // Creating the security answer validation icon label
@@ -198,7 +202,6 @@ public class ResetPasswordFromProfilePage {
                 }
                 return null; // Return null if the input email is exists
             }
-        
         });
         
         emailIcon = new JLabel(); 
@@ -417,7 +420,7 @@ public class ResetPasswordFromProfilePage {
                  // Hide the password by setting echo character to a bullet
                  reEnterPasswordField.setEchoChar('\u2022');
              }
-        }        
+        }
     }
     
     // Inner class to handle password reset actions
@@ -548,29 +551,54 @@ public class ResetPasswordFromProfilePage {
         }
     }
     
-   // Method to encrypt the data, it is used to encrypt all necessary data before storing them into a file 
-   private String encryptData(String data) {
+    public static String encryptData(String data) {
         try {
-            /* SECRET_KEY.getBytes() converts the string key into a byte array
-            SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-            This ensures that the same key is used for both encryption and decryption */
-            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
+            // Generate a random IV
+            byte[] iv = new byte[16];
+            new SecureRandom().nextBytes(iv);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
             
-            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES cipher instance for encryption mode
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPTION_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
+            // AES Key Spec
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
-            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
-                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
-                                                                            // It takes the input data
-                                                                            // Uses the AES encryption algorithm with the given secret key
-                                                                            // Returns an encrypted byte array
-            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted butes into Base64 string for easier storage
-                                                                       // AES encryption produces binary data (not readable). Therefore...
-                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+            
+            // Combine IV and encrypted data (IV Must be known for decryption)
+            byte[] combined = new byte[iv.length + encryptedBytes.length];
+            System.arraycopy(iv, 0, combined, iv.length, encryptedBytes.length);
+            
+            return Base64.getEncoder().encodeToString(combined);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+    
+//   // Method to encrypt the data, it is used to encrypt all necessary data before storing them into a file 
+//   private String encryptData(String data) {
+//        try {
+//            /* SECRET_KEY.getBytes() converts the string key into a byte array
+//            SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
+//            This ensures that the same key is used for both encryption and decryption */
+//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
+//            
+//            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES cipher instance for encryption mode
+//            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPTION_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
+//            
+//            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
+//                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
+//                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
+//                                                                            // It takes the input data
+//                                                                            // Uses the AES encryption algorithm with the given secret key
+//                                                                            // Returns an encrypted byte array
+//            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted butes into Base64 string for easier storage
+//                                                                       // AES encryption produces binary data (not readable). Therefore...
+//                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 }
