@@ -421,6 +421,11 @@ public class MainPage extends Buttons {
                     String decryptedAnswer = decryptData(encryptedAnswer);
                     String decryptedBirthday = decryptData(encryptedBirthday);
                     String decryptedGender = decryptData(encryptedGender);
+                    
+                    System.out.println(decryptedUsername);
+                    System.out.println(decryptedEmail);
+                    System.out.println(decryptedPassword);
+                    System.out.println();
 
                     // Ensure username and password are successfully decrypted before storing the user
                     if (decryptedUsername != null && decryptedPassword != null) { // Create a new User object using the decrypted values

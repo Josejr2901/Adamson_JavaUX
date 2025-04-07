@@ -672,42 +672,6 @@ public class EditProfilePage {
             }
             return userData;
         }
-    
-    
-//    // Save the updated username and email to the file
-//    private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, String encryptedCurrentUsername, 
-//                                       String encryptedNewUsername, String encryptedNewBirthday, String encryptedNewGender) {
-//        try {
-//            // Read the old user data, and update the username and email for the given email and username
-//            File file = new File("user_data.txt");
-//            File tempFile = new File("user_data_temp.txt");
-//            BufferedReader reader = new BufferedReader(new FileReader(file));
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-//
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] parts = line.split(",");
-//                if (parts.length >= 3 && parts[0].equals(encryptedCurrentUsername) && parts[1].equals(encryptedCurrentEmail)) {
-//                    // Replace the username and email with the new values
-//                    writer.write(encryptedNewUsername + "," + encryptedNewEmail + "," + parts[2] + "," + parts[3] + "," + parts[4] + "," + encryptedNewBirthday + "," + encryptedNewGender);
-//                } else {
-//                    writer.write(line);
-//                }
-//                writer.newLine();
-//            }
-//
-//            reader.close();
-//            writer.close();
-//
-//            // Replace the original file with the updated one
-//            if (file.delete()) {
-//                tempFile.renameTo(file);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-        
         
         // Save the updated username and email to the file
         private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, 
@@ -716,6 +680,7 @@ public class EditProfilePage {
             try {
                 File file = new File("user_data.txt");
                 File tempFile = new File("user_data_temp.txt");
+
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
@@ -736,7 +701,7 @@ public class EditProfilePage {
                          
                         } else {
                             writer.write(line); 
-                        }
+                            }
                     } else {
                         writer.write(line);
                     }
@@ -806,57 +771,7 @@ public class EditProfilePage {
             e.printStackTrace();
             return null;
         }
-    }
-    
-    
-//    // Mehod to encrypt the data, it is used to encrypt all the necessary data before storing them into a file
-//    private String encryptData(String data) {
-//        try {
-//            /* SECRET_KEY.getBytes() converts the string key into a byte array
-//               SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-//               This ensures that the same key is used for both encryption and decryption */
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
-//            
-//            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES Cipher instance for encryption mode
-//            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPT_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
-//            
-//            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-//                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
-//                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
-//                                                                                // It takes the input data
-//                                                                                // Uses the AES encryption algorithm with the given secret key.
-//                                                                                // Returns an encrypted byte array
-//                                                                                
-//            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted bytes into Base64 string for easier storage
-//                                                                       // AES encryption produces binary data (not readable). Therefore...
-//                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
-//        } catch (Exception e) {                                        
-//                                                                       
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-//    
-//    // Method to decrypt data, it is used for decrypting any type of data stored in the text file already
-//     private String decryptData(String encryptedData) {
-//            try {
-//                
-//                /* SECRET_KEY.getBytes() converts the string key into a bute array
-//                   SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-//                   This ensures that the same key is used for both encryption and decryption */
-//                SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES decryption 
-//                
-//                Cipher cipher = Cipher.getInstance("AES"); // Cerate a cipher and configure it for AES decryption //Same as encryption, but this time it will be set for decryption
-//                cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keyspec) tells the cipher to decrypt the data using the secret key
-//                
-//                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // Convert the Base64-encoded string back into bytes, because since encrypted data was...
-//                                                                                                   // ... stored as a Base64 string, we first decode it back into original encrypted nature
-//                return new String(decryptedBytes); // Decrypt the data and convert it back into a readable string before returning it                                          
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
+    } 
      
     // Helper method to convert month number (1-12) to month afer 
     private static String getMonthName(int month) {

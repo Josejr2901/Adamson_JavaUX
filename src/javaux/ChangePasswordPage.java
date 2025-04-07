@@ -45,7 +45,7 @@ public class ChangePasswordPage {
     
     // Constructor to initialize the change password window
     ChangePasswordPage(String username, String email, String securityQuestion, String answer) {
-        
+               
         frame = new JFrame("Change Password - ADAMSON AI");
         frame.setSize(420, 440);
         frame.setResizable(false);
@@ -418,13 +418,13 @@ public class ChangePasswordPage {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Retrieve and trim input values from text fields
-            String email = emailTxt.getText().trim();
-            String answer = securityAnswerTxt.getText().trim();
+            String currentEmail = emailTxt.getText().trim();
+            String currentAnswer = securityAnswerTxt.getText().trim();
             String newPassword = new String(newPasswordField.getPassword());
             String confirmNewPassword = new String(confirmNewPasswordField.getPassword());
             
             // Ensure all fiels are filled
-            if (email.isEmpty() || answer.isEmpty() || newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
+            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -444,16 +444,18 @@ public class ChangePasswordPage {
             HashMap<String, String> userData = loadUserData();
             
             // Encrypt email and security answer for validation
-            String encryptedEmail = encryptData(email);
-            String encryptAnswer = encryptData(answer);
+//            String encryptedEmail = encryptData(email);
+//            String encryptAnswer = encryptData(answer);
             
             // Create a unique key using encrypted email and security answer
-            String key = encryptedEmail + ":" + encryptAnswer;
+            String key = currentEmail + ":" + currentAnswer;
             
             // Check if the provided email and answer match any stored user data
             if (userData.containsKey(key)) {
                 // Encrypt new password before saving
                 String encryptedNewPassword = encryptData(newPassword);
+                String encryptedEmail = encryptData(currentEmail);
+                //String currentAnswer = answer;
                 
                 // Save new password to file
                 saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
@@ -469,32 +471,54 @@ public class ChangePasswordPage {
         }
     }
     
-    // Method to lead user data from "user_data.txt" file
-    private HashMap<String, String> loadUserData() {
-        HashMap<String, String> userData = new HashMap<>();
-        
-        // Open the file for reading
-        try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
-            String line;
+//    // Method to lead user data from "user_data.txt" file
+//    private HashMap<String, String> loadUserData() {
+//        HashMap<String, String> userData = new HashMap<>();
+//        
+//        // Open the file for reading
+//        try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
+//            String line;
+//            
+//            while ((line = reader.readLine()) != null) { // Read eah line of the file
+//                String[] parts = line.split(","); // Split line by commas to extract user details
+//                
+//                // Ensure the line has enough data fields (at least 3)
+//                if (parts.length >= 3) {
+//                    String encryptedEmail = parts[1]; // Encrypted email
+//                    String encryptedAnswer = parts[4]; // Encrypted security answer
+//                    String encryptedPassword = parts[2]; // Encrypted password
+//                    
+//                    // Store the encrypted email + answer as a key and passowrd as a value
+//                    userData.put(encryptedEmail + ":" + encryptedAnswer, encryptedPassword);
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return userData; // Return the user data map
+//    }
+    
+      private HashMap<String, String> loadUserData() {
+            HashMap<String, String> userData = new HashMap<>();
             
-            while ((line = reader.readLine()) != null) { // Read eah line of the file
-                String[] parts = line.split(","); // Split line by commas to extract user details
+            try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
+                String line;
                 
-                // Ensure the line has enough data fields (at least 3)
-                if (parts.length >= 3) {
-                    String encryptedEmail = parts[1]; // Encrypted email
-                    String encryptedAnswer = parts[4]; // Encrypted security answer
-                    String encryptedPassword = parts[2]; // Encrypted password
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
                     
-                    // Store the encrypted email + answer as a key and passowrd as a value
-                    userData.put(encryptedEmail + ":" + encryptedAnswer, encryptedPassword);
+                    if (parts.length >= 3) {
+                        String decryptedEmail = decryptData(parts[1]);
+                        String decryptedAnswer = decryptData(parts[4]);
+                        
+                        userData.put(decryptedEmail + ":" + decryptedAnswer, line);  
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return userData;
         }
-        return userData; // Return the user data map
-    }
     
     // Method to update and save a new password in the "user_data.txt" file
     private void saveNewPasswordToFile(String encryptedEmail, String encryptedNewPassword) {
@@ -507,22 +531,35 @@ public class ChangePasswordPage {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
 
-            String line;
-
+            String currentAnswer = securityAnswerTxt.getText().trim();  // Get current username from label
+            String currentEmail = emailTxt.getText().trim();  // Get current email from label
+            
+            String line;           
+          
             // Read each line of the original file
             while ((line = reader.readLine()) != null) {
                 // Split line by commas to extract user details
                 String[] parts = line.split(",");
                 
                 // Check if the line belongs to the user being updated
-                if (parts.length >= 3 && parts[1].equals(encryptedEmail)) {
+                if (parts.length >= 3) {
+                    
+                     String decryptedStoredEmail = decryptData(parts[1]);
+                     String decryptedStoredAnswer = decryptData(parts[4]);
+                     
+                     if (decryptedStoredEmail.equals(currentEmail) && decryptedStoredAnswer.equals(currentAnswer)) {
+                    
                     // Write the updated password to the temporary file
                     writer.write(parts[0] + "," + parts[1] + "," + encryptedNewPassword + "," + parts[3] + "," + parts[4] + "," + parts[5] + "," + parts[6]);
+                     
                 } else {
                     // Write unchanged lines to the temporary file
                     writer.write(line);
+                     }
+                } else {
+                    writer.newLine(); // Move to the next line
                 }
-                writer.newLine(); // Move to the next line
+                writer.newLine();
             }
 
             // Close file streams
@@ -539,28 +576,94 @@ public class ChangePasswordPage {
         }
     }
     
-    /* EAS Encryption method */
+//            private void saveNewPasswordToFile(String encryptedEmail, String encryptedNewPassword) {
+//            try {
+//                File file = new File("user_data.txt");
+//                File tempFile = new File("user_data_temp.txt");
+//                BufferedReader reader = new BufferedReader(new FileReader(file));
+//                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+//
+//                String currentAnswer = securityAnswerTxt.getText().trim();
+//                
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    String[] parts = line.split(",");
+//                    if (parts.length >= 3) {
+//                        // Decrypt stored username and email to compare them in plaintext
+//                        String decryptedStoredEmail = decryptData(parts[1]);
+//                        String decryptedStoredAnswer = decryptData(parts[4]);
+//
+//                        if (decryptedStoredAnswer.equals(currentAnswer)) {
+//                            // Replace with new encrypted values
+//                            writer.write(parts[0] + "," + parts[1] + "," + parts[2] + "," + parts[3] + "," + encryptedNewPassword + "," + parts[5] + "," + parts[6]);
+//                         
+//                        } else {
+//                            writer.write(line); 
+//                        }
+//                    } else {
+//                        writer.write(line);
+//                    }
+//                    writer.newLine();
+//                }
+//
+//                reader.close();
+//                writer.close();
+//
+//                if (file.delete()) {
+//                    tempFile.renameTo(file);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     
+     /* Encryption and decryption methods */
+
     public static String encryptData(String data) {
         try {
-            // Generate String encryptData(String data)
+            // Generate a random IV
             byte[] iv = new byte[16];
             new SecureRandom().nextBytes(iv);
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
             
-           // AES Key Spec
-           SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
-           Cipher cipher = Cipher.getInstance(ALGORITHM);
-           cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-           
-           byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+            // AES Key Spec
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
-           // Combine IV and encrypted data (IV Must be known for decryption)
-           byte[] combined = new byte[iv.length + encryptedBytes.length];
-           System.arraycopy(iv, 0, combined, 0, iv.length);
-           System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
-           
-           return Base64.getEncoder().encodeToString(combined);
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+            
+            // Combine IV and encrypted data (IV must be known for decryption)
+            byte[] combined = new byte[iv.length + encryptedBytes.length];
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
+            
+            return Base64.getEncoder().encodeToString(combined);            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    // Decrypt method with IV
+    public static String decryptData(String encryptedData) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
+
+            // Extract IV (first 16 bytes)
+            byte[] iv = new byte[16];
+            System.arraycopy(decodedBytes, 0, iv, 0, iv.length);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            // Extract encrypted content 
+            byte[] encryptedBytes = new byte[decodedBytes.length - iv.length];
+            System.arraycopy(decodedBytes, iv.length, encryptedBytes, 0, encryptedBytes.length);
+
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+            return new String (cipher.doFinal(encryptedBytes));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
