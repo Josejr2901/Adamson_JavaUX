@@ -201,28 +201,7 @@ public class ForgotPasswordPage {
         new ChangePasswordPage(username, email, securityQuestion, answer); // Open the password chage page
         frame.dispose(); // Close current frame
     }
-    
-//    // AES Decryption method, this will be used for decrypting any type of data stored in the text file already
-//    private String decryptData(String encryptedData) {
-//        try {
-//            
-//            /* SECRET_KEY.getBytes() convertsw the string key into a byte array
-//               SecretKeySpec wraps this byte array into an objext that can be used by the AES algorithm
-//               This ensures that the same key is used for both encryption and decryption */
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");// Create an AES decryption key using the predefined SECRET_KEY 
-//            
-//            Cipher cipher = Cipher.getInstance("AES"); // Create a Cipher instance and confiure it for AES decryption 
-//            cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keySpec) tells the cipher to decrypt the data using the secret key
-//                                                                          
-//            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // convert the Base64-encoded string back into bytes, because since encrypted data was...
-//                                                                                               // ... stored as a Base64 string, we first decode it back into original encrypted nature                                                                                 
-//            return new String(decryptedBytes); // Decrypt te data and convert it back into a readable string before returning it
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-    
+     
     public static String decryptData(String encryptedData) {
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);

@@ -143,7 +143,7 @@ public class ResetPasswordFromProfilePage {
                     return "Incorrect answer!"; // Return null if input does not match the stored security answer
                 }
                 return null; // Return null if the input security answer is correct
-            }            
+            }
         });
          
         // Creating the security answer validation icon label

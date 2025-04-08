@@ -604,34 +604,5 @@ public class ChangePasswordPage {
             return null;
         }
     }
-    
-    
-//    // Method to encrypt data, it is used for encrypting usernames and password, and any other data before storing them into a file
-//    private String encryptData(String data) {
-//        try {
-//            /* SECRET_KEY.getBytes() converts the string key into a byte array.
-//               SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm.
-//               This ensures that the same key is used for both encryption and decryption  
-//            */
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key by using the predefined SECRET_KEY
-//            
-//            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES Cipher instance for encryption mode
-//            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPT_MODE, this tells the cipher that we want to encrypt data using the secret key.
-//            
-//            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-//                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings).
-//                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
-//                                                                                // It takes the input data.
-//                                                                                // Uses the AES encryption algorithm with the given secret key
-//                                                                                // Returns an encrypted byte array
-//                                                                                
-//            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted bytes into a Base64 string for easier storage
-//                                                                       // AES encryption produces binary data (not readable). Therefore...
-//                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-    
+        
 }

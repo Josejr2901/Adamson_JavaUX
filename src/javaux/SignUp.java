@@ -936,90 +936,7 @@ public class SignUp {
             return null;
         }
     }
-     
-     
-//        // Mehod to encrypt the data, it is used to encrypt all the necessary data before storing them into a file
-//        private String encryptData(String data) {
-//            try {
-//                /* SECRET_KEY.getBytes() converts the string key into a byte array
-//                   SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-//                   This ensures that the same key is used for both encryption and decryption */
-//                SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
-//
-//                Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES Cipher instance for encryption mode
-//                cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPT_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
-//
-//                byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-//                                                                         // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
-//                                                                         // cipher.doFinal(data.getBytes()) performs the encryption:
-//                                                                                    // It takes the input data
-//                                                                                    // Uses the AES encryption algorithm with the given secret key.
-//                                                                                    // Returns an encrypted byte array
-//
-//                return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted bytes into Base64 string for easier storage
-//                                                                           // AES encryption produces binary data (not readable). Therefore...
-//                                                                           // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
-//        
-//            // Method to decrypt data, it is used for decrypting any type of data stored in the text file already
-//    private String decryptData(String encryptedData) {
-//        try {
-//            
-//            /* SECRET_KEY.getBytes() converts the string key into a byte array
-//               SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-//               This ensures that the same key is used for both encryption and decryption */
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES decryption key using the predifined SECRET_KEY //  Same as in encryption
-//            
-//            Cipher cipher = Cipher.getInstance("AES"); // Create a Cipher instance and configure it for AES decryption // Same as encryption, but this time it will be set for decryption
-//            cipher.init(Cipher.DECRYPT_MODE, keySpec); // Initialize cipher in DECRYPT_MODE // .init(Cipher.DECRYPT_MODE, keySpec) tells the cipher to decrypt the data using the secret key
-//            
-//            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); // Convert the Base64-encoded string back into bytes, because Since encrypted data was..
-//                                                                                               // ...stored as a Base64 string, we first decode it back into original encrypted nature
-//            return new String(decryptedBytes); // Decryot the data and convert it back into a readable string before returning it
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-    
-//  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                                                                                                                                //
-//   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//         
-///                 // Mehod to encrypt the data, it is used to encrypt all the necessary data before storing them into a file
-//        private String encryptData(String data) {
-//            try {
-//                SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); 
-//                Cipher cipher = Cipher.getInstance("AES"); 
-//                cipher.init(Cipher.ENCRYPT_MODE, keySpec); 
-//                byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-//                return Base64.getEncoder().encodeToString(encryptedBytes); 
-//            } catch (Exception e) {                                        
-//
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
-//        
-//            // Method to decrypt data, it is used for decrypting any type of data stored in the text file already
-//    private String decryptData(String encryptedData) {
-//        try {
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); 
-//            
-//            Cipher cipher = Cipher.getInstance("AES");
-//            cipher.init(Cipher.DECRYPT_MODE, keySpec);
-//            
-//            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData)); 
-//            return new String(decryptedBytes);  
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
+      
 
     // Helper method to convert month number (1-12) to month name
         private static String getMonthName(int month) {
@@ -1045,13 +962,13 @@ public class SignUp {
 //    public void loadUserData() {                                                                                                                                            // 
 //        try {                                                                                                                                                               //
 //            // Simulating reading an encrypted string from a file (replace with actual file read)                                                                           //                                                                                               
-//            String encryptedUsername = "1d2NttZdzv1QxkgT1J1WvA=="; // Example encrypted Username                                                                            //           
-//            String encryptedEmail = "IJuBBCnNa0TNyXkH60p89uQpVnttnO9ZKwNe/b3s59k="; // Example encrypted Email                                                              //
-//            String encryptedPassword = "YlrcCo/aDddDXthBcCYFtQ=="; // Example encrypted Password                                                                            //  
-//            String encryptedQuestion = "larj27HNjU/RD5qZOTXJkg=="; // Example encrypted Security Question                                                                   //  
-//            String encryptedAnswer = "Iqutu+y0YsQlVtcsmycTKw==";   //Example encrypted Security Question Answer                                                             //  
-//            String encryptedBirthday = "UqlswWDWlzXqQVGDumMmSA=="; // Example encrypted Birthday                                                                            //                
-//            String encryptedGender = "UqsC+snAIk2cF8eGAcYODQ=="; // Example encrypted Gender                                                                                //                                                                                                                                 
+//            String encryptedUsername = "gz+bqhrD7tHAKK/lP8Bef8gaVQa85VZZte4x91e5+zk="; // Example encrypted Username                                                                            //           
+//            String encryptedEmail = "vvzuE/opqccQx2ZftTt0DtF+Dp8vwhcRm7Hu5hxgqpVY4M37lbn+6C5LkT/GWw6f"; // Example encrypted Email                                                              //
+//            String encryptedPassword = "b4s2hzmw12Gq4MDM4k09Ki2gByrWeEivrlE3wbDharA="; // Example encrypted Password                                                                            //  
+//            String encryptedQuestion = "mRIb2VFvVic1GF6/IGtp2agI0voQP40H6GvyjCTB0QA="; // Example encrypted Security Question                                                                   //  
+//            String encryptedAnswer = "wt23+/sHBKEUik1saf5Aas4OHfQP/FJzSTQDZ0vWc40=";   //Example encrypted Security Question Answer                                                             //  
+//            String encryptedBirthday = "UjKvOLnH5vxCOlZdFBFoqKbC2iIOqitBeXhToS/btMw="; // Example encrypted Birthday                                                                            //                
+//            String encryptedGender = "vbiIUqqJwsjvqmCHJ3IrAotO2m1q8URMh+lIoTMMGMY="; // Example encrypted Gender                                                                                //                                                                                                                                 
 //                                                                                                                                                                            // 
 //            // Decrypt the data using the decryptData method                                                                                                                //
 //            String decryptedUsername = decryptData(encryptedUsername);                                                                                                      //                           

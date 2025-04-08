@@ -44,13 +44,7 @@ public class ProfilePage {
         frame.setLocationRelativeTo(null);
         
         ImageIcon icon = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\adamson-logo.png");
-        frame.setIconImage(icon.getImage());
-        
-//        ImageIcon profilePictureMale1 = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\profilePictureMaleWhite.png");
-//        ImageIcon profilePictureMale2 = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\profilePictureMaleGold.png");
-//        
-//        ImageIcon profilePictureFemale1 = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\profilePictureFemaleWhite.png");
-//        ImageIcon profilePictureFemale2 = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\profilePictureFemaleGold.png");
+        frame.setIconImage(icon.getImage()); 
         
         profilePictureButton = new JButton();
         profilePictureButton.setContentAreaFilled(false);
