@@ -470,33 +470,7 @@ public class ChangePasswordPage {
             }
         }
     }
-    
-//    // Method to lead user data from "user_data.txt" file
-//    private HashMap<String, String> loadUserData() {
-//        HashMap<String, String> userData = new HashMap<>();
-//        
-//        // Open the file for reading
-//        try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
-//            String line;
-//            
-//            while ((line = reader.readLine()) != null) { // Read eah line of the file
-//                String[] parts = line.split(","); // Split line by commas to extract user details
-//                
-//                // Ensure the line has enough data fields (at least 3)
-//                if (parts.length >= 3) {
-//                    String encryptedEmail = parts[1]; // Encrypted email
-//                    String encryptedAnswer = parts[4]; // Encrypted security answer
-//                    String encryptedPassword = parts[2]; // Encrypted password
-//                    
-//                    // Store the encrypted email + answer as a key and passowrd as a value
-//                    userData.put(encryptedEmail + ":" + encryptedAnswer, encryptedPassword);
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return userData; // Return the user data map
-//    }
+     
     
       private HashMap<String, String> loadUserData() {
             HashMap<String, String> userData = new HashMap<>();
@@ -574,48 +548,7 @@ public class ChangePasswordPage {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    
-//            private void saveNewPasswordToFile(String encryptedEmail, String encryptedNewPassword) {
-//            try {
-//                File file = new File("user_data.txt");
-//                File tempFile = new File("user_data_temp.txt");
-//                BufferedReader reader = new BufferedReader(new FileReader(file));
-//                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-//
-//                String currentAnswer = securityAnswerTxt.getText().trim();
-//                
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    String[] parts = line.split(",");
-//                    if (parts.length >= 3) {
-//                        // Decrypt stored username and email to compare them in plaintext
-//                        String decryptedStoredEmail = decryptData(parts[1]);
-//                        String decryptedStoredAnswer = decryptData(parts[4]);
-//
-//                        if (decryptedStoredAnswer.equals(currentAnswer)) {
-//                            // Replace with new encrypted values
-//                            writer.write(parts[0] + "," + parts[1] + "," + parts[2] + "," + parts[3] + "," + encryptedNewPassword + "," + parts[5] + "," + parts[6]);
-//                         
-//                        } else {
-//                            writer.write(line); 
-//                        }
-//                    } else {
-//                        writer.write(line);
-//                    }
-//                    writer.newLine();
-//                }
-//
-//                reader.close();
-//                writer.close();
-//
-//                if (file.delete()) {
-//                    tempFile.renameTo(file);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+    } 
     
      /* Encryption and decryption methods */
 

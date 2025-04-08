@@ -422,20 +422,20 @@ public class ResetPasswordFromProfilePage {
              }
         }
     }
-    
+         
     // Inner class to handle password reset actions
     private class ResetPasswordAction implements ActionListener {
         
         @Override
         public void actionPerformed(ActionEvent e) {
             // Retrieve and trim input values from text fields
-            String email = emailTxt.getText().trim();
-            String answer = securityAnswerTxt.getText().trim();
+            String currentEmail = emailTxt.getText().trim();
+            String currentAnswer = securityAnswerTxt.getText().trim();
             String newPassword = new String(newPasswordField.getPassword());
             String reEnterPassword = new String(reEnterPasswordField.getPassword());
             
             // Ensure all fields are filled
-            if (email.isEmpty() || answer.isEmpty() || newPassword.isEmpty() || reEnterPassword.isEmpty()) {
+            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || reEnterPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -456,17 +456,18 @@ public class ResetPasswordFromProfilePage {
             HashMap<String, String> userData = loadUserData();
             
             // Encrypt email user data from file
-            String encryptedEmail = encryptData(email);
-            String encryptedAnswer = encryptData(answer);
+            //String encryptedEmail = encryptData(email);
+            //String encryptedAnswer = encryptData(answer);
             
             // Create a unique key using encrypted email and security answer
-            String key = encryptedEmail + ":" + encryptedAnswer;
+            String key = currentEmail + ":" + currentAnswer;
             
             // Check if the provided email and answer match any stored user data
             if (userData.containsKey(key)) {
                 
                 // Encrypt new password before saving
                 String encryptedNewPassword = encryptData(newPassword);
+                String encryptedEmail = encryptData(currentEmail);
                 
                 // Save new password to file
                 saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
@@ -481,7 +482,7 @@ public class ResetPasswordFromProfilePage {
                 JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
+    } 
     
     // Method to lead user data from "user_data.txt" file
     private HashMap<String, String> loadUserData() {
@@ -496,12 +497,11 @@ public class ResetPasswordFromProfilePage {
                 
                 // Ensure the line has enough data fields (at least 3)
                 if (parts.length >= 3) {
-                    String encryptedEmail = parts[1]; // Encrypted email
-                    String encryptedAnswer = parts[4]; // Encrypted security answer
-                    String encryptedPassword = parts[2]; // Encrypted password
+                    String decryptedEmail = decryptData(parts[1]); // Encrypted email
+                    String decryptedAnswer = decryptData(parts[4]); // Encrypted security answer
                     
                     // Store the encrypted email + answer as a key and password as a value
-                    userData.put(encryptedEmail + ":" + encryptedAnswer, encryptedPassword);
+                    userData.put(decryptedEmail + ":" + decryptedAnswer, line);
                 }
             }
         } catch (IOException e) {
@@ -509,8 +509,9 @@ public class ResetPasswordFromProfilePage {
         }
         return userData; // Return the user data map
     }
+     
     
-    // Method to update and save a new password in the "user_data.txt" file
+        // Method to update and save a new password in the "user_data.txt" file
     private void saveNewPasswordToFile(String encryptedEmail, String encryptedNewPassword) {
         try {
             // Open the original user data file
@@ -521,16 +522,29 @@ public class ResetPasswordFromProfilePage {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
             
+            String currentAnswer = securityAnswerTxt.getText().trim();
+            String currentEmail = emailTxt.getText().trim();
+            
             // Read each line of the original file
             String line;
+            
             while ((line = reader.readLine()) != null) {
                 // Split line by commas to extract user details
                 String[] parts = line.split(",");
                 
                 // Check if the line belongs to the user being updated
-                if (parts.length >= 3 && parts[1].equals(encryptedEmail)) {
+                if (parts.length >= 3) {
                     // Write the updated password to the temporary file
-                    writer.write(parts[0] + "," + parts[1] + "," + encryptedNewPassword + "," + parts[3] + "," + parts[4] + "," + parts[5] + "," + parts[6]);
+                    String decryptedStoredEmail = decryptData(parts[1]);
+                    String decryptedStoredAnswer = decryptData(parts[4]);
+                    
+                    if (decryptedStoredEmail.equals(currentEmail) && decryptedStoredAnswer.equals(currentAnswer)) {
+                    
+                        writer.write(parts[0] + "," + parts[1] + "," + encryptedNewPassword + "," + parts[3] + "," + parts[4] + "," + parts[5] + "," + parts[6]); 
+                    } else {
+                        writer.write(line);
+                    }
+                    
                 } else {
                     // Write unchanged lines to the temporary file
                     writer.write(line);
@@ -576,30 +590,28 @@ public class ResetPasswordFromProfilePage {
             return null;
         }
     }
-    
-//   // Method to encrypt the data, it is used to encrypt all necessary data before storing them into a file 
-//   private String encryptData(String data) {
-//        try {
-//            /* SECRET_KEY.getBytes() converts the string key into a byte array
-//            SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-//            This ensures that the same key is used for both encryption and decryption */
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES"); // Create an AES encryption key using the SECRET_KEY
-//            
-//            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES cipher instance for encryption mode
-//            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPTION_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
-//            
-//            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-//                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
-//                                                                     // cipher.doFinal(data.getBytes()) performs the encryption:
-//                                                                            // It takes the input data
-//                                                                            // Uses the AES encryption algorithm with the given secret key
-//                                                                            // Returns an encrypted byte array
-//            return Base64.getEncoder().encodeToString(encryptedBytes); // Convert the encrypted butes into Base64 string for easier storage
-//                                                                       // AES encryption produces binary data (not readable). Therefore...
-//                                                                       // Base64.getEncoder().encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
+
+    public static String decryptData(String encryptedData) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
+            
+            // Extract IV (first 16 bytes)
+            byte[] iv = new byte[16];
+            System.arraycopy(decodedBytes, 0, iv, 0, iv.length);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+            
+            // Extract encrypted content
+            byte[] encryptedBytes = new byte[decodedBytes.length - iv.length];
+            System.arraycopy(decodedBytes, iv.length, encryptedBytes, 0, encryptedBytes.length);
+            
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            
+            return new String (cipher.doFinal(encryptedBytes));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
