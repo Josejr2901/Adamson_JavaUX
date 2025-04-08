@@ -44,6 +44,8 @@ import javax.swing.JOptionPane; // Displays pop-up dialogs (alers, messages, con
 import javax.swing.JTextField; // Represents a single-line text input field
 import javax.swing.SwingConstants; // Provides constant for UI alignment (e.g., left, right, cener)e
 
+import javax.crypto.spec.*;
+import java.security.SecureRandom;
  
 public class securityQuestionDeleteProfile {
     
@@ -59,6 +61,8 @@ public class securityQuestionDeleteProfile {
     // AES key for encryption and decryption 
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
 
+    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
+    
     // Constructor method for the deleting a user profile with a security question
     public securityQuestionDeleteProfile(User user) {
         
@@ -69,7 +73,7 @@ public class securityQuestionDeleteProfile {
         //String currentUsername = user.getUsername(); // Store current username
         String currentEmail = user.getEmail(); // Get the user's email
         String securityQuestion = user.getQuestion(); // Get the security question set by the user
-        String answer = user.getAnswer(); // Get the answer to the security question
+        String rightAnswer = user.getAnswer(); // Get the answer to the security question
         
         // Create and configure the JFrame for the delete account prompt
         frame = new JFrame("Delete Account ADAMSON-AI"); //Set the window title
@@ -113,62 +117,59 @@ public class securityQuestionDeleteProfile {
         confirmButton.setBackground(Color.decode("#876F4D")); // Set the background color (goldish brown)
         confirmButton.setForeground(Color.WHITE); // Set text color to white
         confirmButton.setBounds(50, 200, 280, 30); // Set position and size
-        
+         
         // Add an action listener for the confirm button
         confirmButton.addActionListener(e -> {
-            String securityAnswer = securityAnswerTxt.getText().trim(); // Retrieve the user-inputted answer and remove spaces
             
+            String securityAnswer = securityAnswerTxt.getText().trim(); // Retrieve the user-inputted answer and remove spaces
+
             // Check if the account is locked due to multiple failed attempts
             if (isBlocked()) {
                 long timeleft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
                 JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + timeleft + " seconds"); // Alert the user 
                 return; // Stop further execution
             }
-            
+
             // Validate the security answer input
             if (securityAnswer.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Please enter the answer to proceed", "Enter an answer", JOptionPane.INFORMATION_MESSAGE);
-            } else if (!securityAnswer.equals(answer)) { // If the answer is incorrect
+            } else if (!securityAnswer.equals(rightAnswer)) { // If the answer is incorrect
                 JOptionPane.showMessageDialog(frame, "Invalid Password. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
                 failedAttempts++; // Increase the failed attempt counter
-                
+
                 // Lock the account if the maximum number of failed attempts is reached 
                 if(failedAttempts >= MAX_FAILED_ATTEMPTS) {
                     blockTime = System.currentTimeMillis(); // Record the lock time
-                    
+
                     saveLockStatus(username, blockTime); // Save the lock status to prevent further attemmpts 
-                    
+
                     JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for 1 minute", "Account temporary blocked", JOptionPane.ERROR_MESSAGE);
                 }
             } else { // If the answer is correct
                 failedAttempts = 0; // Reset the failed attempts counter
-                
+
                 // Load user data from the database or file
-                HashMap<String, String> userData = loadUserData();
-                
-                // Encrypt the username and email for verification
-                String encryptedCurrentEmail = encryptData(currentEmail);
-                String encryptedCurrentUsername = encryptData(username);
-                
+                HashMap<String, String> userData = loadUserData(); 
+
                 // Create a unique key using encrypted email and username
-                String key = encryptedCurrentEmail + ":" + encryptedCurrentUsername;
-                
+                String key = currentEmail + ":" + username;
+
                 // Check if the user exists in the database
                 if (userData.containsKey(key)) {
                     // Ask the user for the final confirmation before deletion
                     int response = JOptionPane.showConfirmDialog(frame, // The 
                             "Are you sure you want to delete your account? This action cannot be undone.",
                             "DeleteAccount", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    
+
                     if (response == JOptionPane.YES_OPTION) { // If the user confirms account deletion
-                        deleteUserData(encryptedCurrentEmail, encryptedCurrentUsername); // Delete usr data
-                        
+                        deleteUserData(currentEmail, username); // Delete usr data
+
                         try{
                             Files.deleteIfExists(Paths.get("session.txt")); // Delete the session file (logs the user out) 
                         } catch (IOException ioException) {
                             ioException.printStackTrace(); // Print the error if the file detection fails
                         }
-                        
+
                         frame.dispose(); // Close the current window
                         new MainPage(userData); // Redirect to the main page
                     }
@@ -289,42 +290,33 @@ public class securityQuestionDeleteProfile {
             }
         }
         return false; // In case the failed attempts are below the max limits, the account is not blocked, and the user can keep trying to login
-    }
-
-    // Helper method to load user data from the "user_data.txt" file
+    } 
+    
     private HashMap<String, String> loadUserData() {
-        // Creates a HashMap to store user data, using "email:username"  as the key and the full line as the value 
         HashMap<String, String> userData = new HashMap<>();
         
-        // Opens the file "user_data.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
+            String line;
             
-            String line; // Variable to store each line read from the file
-            
-            while ((line = reader.readLine()) != null) { // Reads the file line by line until there are no more lines
-                String[] parts = line.split(","); // Splits the line into an array of parts, using a comma as a delimeter
-
-                // Checks if the line contains at least 3 elements (ensuring prper formatting)
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                
                 if (parts.length >= 3) {
-                    // Extracts the encrypted username and email from the file
-                    String encryptedUsername = parts[0]; // First column is the encrypted username
-                    String encryptedEmail = parts[1];    // Second column is the encrypted email
+                    String decryptedEmail = decryptData(parts[1]);
+                    String decryptedUsername = decryptData(parts[0]);
                     
-                    // Stores the user data in the HashMap with "email:username" as the key
-                    userData.put(encryptedEmail + ":" + encryptedUsername, line);
+                    userData.put(decryptedEmail + ":" + decryptedUsername, line);
                 }
             }
         } catch (IOException e) {
-            // Catches and prints an error message if there is an issue reading the file
             e.printStackTrace();
         }
-        // Return the HashMap containing user data
         return userData;
     }
     
     // Method to delete a user's data based on their encrypted email and username
-    private void deleteUserData(String encryptedEmail, String encryptedUsername) {
-        try{            
+    private void deleteUserData(String currentEmail,  String username) {
+        try{
             File file = new File("user_data.txt"); // References the original user data file
             File tempFile = new File("user_data_temp.txt"); // Creates a temporary file to store the updated data without the deleted user
             
@@ -332,7 +324,7 @@ public class securityQuestionDeleteProfile {
             if (!tempFile.exists()) {
                 tempFile.createNewFile(); // Creates a new file if it does not exist
             }
-            
+                                    
             // Opens the original file for reading and the temp file for writing
             BufferedReader reader = new BufferedReader(new FileReader(file));
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
@@ -347,11 +339,11 @@ public class securityQuestionDeleteProfile {
                 // Ensures the line contains at least 3 elements
                 if (parts.length >= 3) {
                     // Extracts and trims the stored email and username
-                    String storedEmail = parts[1].trim();
-                    String storedUsername = parts[0].trim();
+                    String storedEmail = decryptData(parts[1]); 
+                    String storedUsername = decryptData(parts[0]);
 
                     // If the email and username match the provided encrypted credentials, mark as found and skip writing this line 
-                    if (storedEmail.equals(encryptedEmail) && storedUsername.equals(encryptedUsername)) {
+                    if (storedEmail.equals(currentEmail) && storedUsername.equals(username)) {
                         foundUser = true;
                         continue;
                     }
@@ -393,29 +385,53 @@ public class securityQuestionDeleteProfile {
             // Displays an error message in case of an issue deleting account data
             JOptionPane.showMessageDialog(frame, "Error occurred while deleting account data", "Error", JOptionPane.ERROR_MESSAGE); 
         }
-    }
-
-    // Method to encrypt the data, it is used to encrypt all necessary data before storing them into a file
-    private String encryptData(String data) {
+    } 
+    
+    public static String encryptData(String data) {
         try {
-            /* SECRET_KEY.getBytes() converts the string key into a byte array
-               SecretKeySpec wraps this byte array into an object that can be used by the AES algorithm
-               This ensures that the same key is used for both encryption and decryption */
-            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");  // Create an AES encryption key using the SECRET_KEY
+            // Generate a random IV
+            byte[] iv = new byte[16];
+            new SecureRandom().nextBytes(iv);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
             
-            Cipher cipher = Cipher.getInstance("AES"); // Initialize to create an AES Cipher instance for encryption mode
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec); // Initialize cipher in ENCRYPT_MODE, this tells the cipher that we want to encrypt the data using the SECRET_KEY
+            // AES Key Spec
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
-            byte[] encryptedBytes = cipher.doFinal(data.getBytes()); // Perform encryption on the input data
-                                                                     // data.getBytes() converts the plaintext string into a byte array (AES works with bytes, not strings)
-                                                                     // cipher.doFinal(data.getBytes()) performs the encryption;
-                                                                                // It takes the input data
-                                                                                // Uses the AES encryption algorithm with the given secret key
-                                                                                // Returns an encryption byte array
+            byte[] encryptedBytes = cipher.doFinal(data.getBytes());
             
-            return Base64.getEncoder().encodeToString(encryptedBytes); // Converts the encrypted bytes into Base64 string for the easier storage 
-                                                                       // AES encryption produces binary data (not readable). Therefore...
-                                                                       // Base64.getEncoder(). encodeToString(encryptedBytes) converts the encrypted bytes into a readable Base64 string 
+            // Combine IV and encrypted data (IV Must be known for decryption)
+            byte[] combined = new byte[iv.length + encryptedBytes.length];
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
+            
+            return Base64.getEncoder().encodeToString(combined);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    // Decrypt method with IV
+    public static String decryptData(String encryptedData) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
+
+            // Extract IV (first 16 bytes)
+            byte[] iv = new byte[16];
+            System.arraycopy(decodedBytes, 0, iv, 0, iv.length);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            // Extract encrypted content 
+            byte[] encryptedBytes = new byte[decodedBytes.length - iv.length];
+            System.arraycopy(decodedBytes, iv.length, encryptedBytes, 0, encryptedBytes.length);
+
+            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+            return new String (cipher.doFinal(encryptedBytes));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

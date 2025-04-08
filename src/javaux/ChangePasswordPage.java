@@ -534,7 +534,7 @@ public class ChangePasswordPage {
             String currentAnswer = securityAnswerTxt.getText().trim();  // Get current username from label
             String currentEmail = emailTxt.getText().trim();  // Get current email from label
             
-            String line;           
+            String line;
           
             // Read each line of the original file
             while ((line = reader.readLine()) != null) {
@@ -622,6 +622,8 @@ public class ChangePasswordPage {
     public static String encryptData(String data) {
         try {
             // Generate a random IV
+            // Random Initialization Vector (IV): crucial element used with symmetric ciphers to ensure that the same 
+            // plaintext, when encrypted multiple times, produces different ciphertexts, enhancing security
             byte[] iv = new byte[16];
             new SecureRandom().nextBytes(iv);
             IvParameterSpec ivSpec = new IvParameterSpec(iv);

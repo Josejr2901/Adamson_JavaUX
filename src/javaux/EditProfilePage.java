@@ -557,12 +557,6 @@ public class EditProfilePage {
                 }
             }
 
-//            // Check if username format is valid
-//            if (!newUsername.matches("[a-zA-Z0-9_]+")) {
-//                JOptionPane.showMessageDialog(null, "'Username' not valid [No spaces, and use only alphanumeric values and/or '_']", "Error", JOptionPane.ERROR_MESSAGE);
-//                return;
-//            }
-
             // Load existing users data
             HashMap<String, String> userData = loadUserData();
 //            String encryptedCurrentEmail = encryptData(currentEmail); // Encrypt current email

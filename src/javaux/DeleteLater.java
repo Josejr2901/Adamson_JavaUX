@@ -1,179 +1,67 @@
-//
-//
-//
-//
-//
-//            private void saveNewPasswordToFile(String encryptedEmail, String encryptedNewPassword) {
-//            try {
-//
-//                File file = new File("user_data.txt");
-//                File tempFile = new File("user_data_temp.txt");
-//
-//
-//                BufferedReader reader = new BufferedReader(new FileReader(file));
-//                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-//
-//                String currentAnswer = securityAnswerTxt.getText().trim();
-//                
-//                String line;
-//
-//
-//
-//                while ((line = reader.readLine()) != null) {
-//
-//                    String[] parts = line.split(",");
-//
-//
-//                    if (parts.length >= 3) {
-//                        // Decrypt stored username and email to compare them in plaintext
-//                        String decryptedStoredEmail = decryptData(parts[1]);
-//                        String decryptedStoredAnswer = decryptData(parts[4]);
-//
-//                        if (decryptedStoredAnswer.equals(currentAnswer)) {
-//                            // Replace with new encrypted values
-//                            writer.write(parts[0] + "," + parts[1] + "," + parts[2] + "," + parts[3] + "," + encryptedNewPassword + "," + parts[5] + "," + parts[6]);
-//                         
-//                        } else {
-//                            writer.write(line); 
-//                        }
-//                    } else {
-//                        writer.write(line);
-//                    }
-//                    writer.newLine();
-//                }
-//
-//                reader.close();
-//                writer.close();
-//
-//                if (file.delete()) {
-//                    tempFile.renameTo(file);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+/* 
 
-///////////////////////////////////////EditPrifilePage.java/////////////////////////////////////////////////////
+// Add an action listener for the confirm button
+        confirmButton.addActionListener(e -> {
+            String securityAnswer = securityAnswerTxt.getText().trim(); // Retrieve the user-inputted answer and remove spaces
+            
+            // Check if the account is locked due to multiple failed attempts
+            if (isBlocked()) {
+                long timeleft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
+                JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + timeleft + " seconds"); // Alert the user 
+                return; // Stop further execution
+            }
+            
+            // Validate the security answer input
+            if (securityAnswer.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please enter the answer to proceed", "Enter an answer", JOptionPane.INFORMATION_MESSAGE);
+            } else if (!securityAnswer.equals(answer)) { // If the answer is incorrect
+                JOptionPane.showMessageDialog(frame, "Invalid Password. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
+                failedAttempts++; // Increase the failed attempt counter
+                
+                // Lock the account if the maximum number of failed attempts is reached 
+                if(failedAttempts >= MAX_FAILED_ATTEMPTS) {
+                    blockTime = System.currentTimeMillis(); // Record the lock time
+                    
+                    saveLockStatus(username, blockTime); // Save the lock status to prevent further attemmpts 
+                    
+                    JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for 1 minute", "Account temporary blocked", JOptionPane.ERROR_MESSAGE);
+                }
+            } else { // If the answer is correct
+                failedAttempts = 0; // Reset the failed attempts counter
+                
+                // Load user data from the database or file
+                HashMap<String, String> userData = loadUserData();
+                
+                // Encrypt the username and email for verification
+                String encryptedCurrentEmail = encryptData(currentEmail);
+                String encryptedCurrentUsername = encryptData(username);
+                
+                // Create a unique key using encrypted email and username
+                String key = encryptedCurrentEmail + ":" + encryptedCurrentUsername;
+                
+                // Check if the user exists in the database
+                if (userData.containsKey(key)) {
+                    // Ask the user for the final confirmation before deletion
+                    int response = JOptionPane.showConfirmDialog(frame, // The 
+                            "Are you sure you want to delete your account? This action cannot be undone.",
+                            "DeleteAccount", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    
+                    if (response == JOptionPane.YES_OPTION) { // If the user confirms account deletion
+                        deleteUserData(encryptedCurrentEmail, encryptedCurrentUsername); // Delete usr data
+                        
+                        try{
+                            Files.deleteIfExists(Paths.get("session.txt")); // Delete the session file (logs the user out) 
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace(); // Print the error if the file detection fails
+                        }
+                        
+                        frame.dispose(); // Close the current window
+                        new MainPage(userData); // Redirect to the main page
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "The information does not match any account in the database.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
 
-// 
-//        private HashMap<String, String> loadUserData() {
-//            HashMap<String, String> userData = new HashMap<>();
-//            try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
-//
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    String[] parts = line.split(",");
-//
-//                    if (parts.length >= 3) {
-//                        String decryptedUsername = decryptData(parts[0]);
-//                        String decryptedEmail = decryptData(parts[1]);
-//
-//                        userData.put(decryptedEmail + ":" + decryptedUsername, line);  
-//                    }
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return userData;
-//        }
-//
-//
-//
-//
-
-    // Save the updated username and email to the file
-//        private void saveUpdatedDataToFile(String encryptedCurrentEmail, String encryptedNewEmail, 
-//                                       String encryptedCurrentUsername, String encryptedNewUsername, 
-//                                       String encryptedNewBirthday, String encryptedNewGender) {
-//            try {
-//                File file = new File("user_data.txt");
-//                File tempFile = new File("user_data_temp.txt");
-//                BufferedReader reader = new BufferedReader(new FileReader(file));
-//                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-//
-//                String currentUsername = currentUsernameLabel.getText().trim();  // Get current username from label
-//                String currentEmail = currentEmailLabel.getText().trim();  // Get current email from label
-//                
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    String[] parts = line.split(",");
-//                    if (parts.length >= 3) {
-//                        // Decrypt stored username and email to compare them in plaintext
-//                        String decryptedStoredUsername = decryptData(parts[0]);
-//                        String decryptedStoredEmail = decryptData(parts[1]);
-//
-//                        if (decryptedStoredUsername.equals(currentUsername) && decryptedStoredEmail.equals(currentEmail)) {
-//                            // Replace with new encrypted values
-//                            writer.write(encryptedNewUsername + "," + encryptedNewEmail + "," + parts[2] + "," + parts[3] + "," + parts[4] + "," + encryptedNewBirthday + "," + encryptedNewGender);
-//                         
-//                        } else {
-//                            writer.write(line); 
-//                        }
-//                    } else {
-//                        writer.write(line);
-//                    }
-//                    writer.newLine();
-//                }
-//
-//                reader.close();
-//                writer.close();
-//
-//                if (file.delete()) {
-//                    tempFile.renameTo(file);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-
-//public static String encryptData(String data) {
-//        try {
-//            // Generate a random IV
-//            byte[] iv = new byte[16];
-//            new SecureRandom().nextBytes(iv);
-//            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-//            
-//            // AES Key Spec
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
-//            Cipher cipher = Cipher.getInstance(ALGORITHM);
-//            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-//            
-//            byte[] encryptedBytes = cipher.doFinal(data.getBytes());
-//            
-//            // Combine IV and encrypted data (IV must be known for decryption)
-//            byte[] combined = new byte[iv.length + encryptedBytes.length];
-//            System.arraycopy(iv, 0, combined, 0, iv.length);
-//            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
-//            
-//            return Base64.getEncoder().encodeToString(combined);            
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-    
-//    // Decrypt method with IV
-//    public static String decryptData(String encryptedData) {
-//        try {
-//            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
-//
-//            // Extract IV (first 16 bytes)
-//            byte[] iv = new byte[16];
-//            System.arraycopy(decodedBytes, 0, iv, 0, iv.length);
-//            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-//
-//            // Extract encrypted content 
-//            byte[] encryptedBytes = new byte[decodedBytes.length - iv.length];
-//            System.arraycopy(decodedBytes, iv.length, encryptedBytes, 0, encryptedBytes.length);
-//
-//            SecretKeySpec keySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
-//            Cipher cipher = Cipher.getInstance(ALGORITHM);
-//            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-//
-//            return new String (cipher.doFinal(encryptedBytes));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
+*/

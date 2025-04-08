@@ -857,7 +857,7 @@ public class SignUp {
                 }
             }
             reader.close(); // Close the reader after processing
-        } catch (IOException e) { 
+        } catch (IOException e) {
             e.printStackTrace(); 
         }
         return false; // Username not found, so it is not taken
@@ -906,7 +906,7 @@ public class SignUp {
             System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
 
             return Base64.getEncoder().encodeToString(combined);
-        } catch (Exception e) { 
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
