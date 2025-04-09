@@ -164,7 +164,7 @@ public class securityQuestionDeleteProfile {
                     if (response == JOptionPane.YES_OPTION) { // If the user confirms account deletion
                         deleteUserData(currentEmail, username); // Delete usr data
 
-                        try{
+                        try {
                             Files.deleteIfExists(Paths.get("session.txt")); // Delete the session file (logs the user out) 
                         } catch (IOException ioException) {
                             ioException.printStackTrace(); // Print the error if the file detection fails

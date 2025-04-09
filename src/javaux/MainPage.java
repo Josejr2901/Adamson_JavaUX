@@ -294,6 +294,7 @@ public class MainPage extends Buttons {
                 source.setForeground(Color.WHITE); // Sets the text color of the button to white
                 source.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1)); // Sets the button border to white
             }
+            
             // Method triggered when a mouse button is pressed in a button. It modifies the button's appearance to provide visual feedback
             @Override
             public void mousePressed(MouseEvent e) {
