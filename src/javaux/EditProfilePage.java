@@ -56,6 +56,7 @@ import javax.swing.*;
 
 import javax.crypto.spec.IvParameterSpec; 
 import java.security.SecureRandom; 
+import java.util.Date;
 
 // Definition of the EditProfilePage class 
 public class EditProfilePage {
@@ -517,12 +518,8 @@ public class EditProfilePage {
             String currentEmail = currentEmailLabel.getText().trim();  // Get current email from label
             String newUsername = newUsernameTxt.getText().trim();  // New username from text field
             String newEmail = newEmailTxt.getText().trim();  // New email from text field
-            int day = (int) dayDropdown.getSelectedItem();
-            String month = (String) monthDropdown.getSelectedItem();
-            int year = (int) yearDropdown.getSelectedItem();
-            String newBirthday = String.format("%d %s %d", day, month, year);
             String newGender = maleButton.isSelected() ? "Male" : "Female";
-
+            
             if (newUsername.isEmpty()) {
                 newUsername = currentUsername;
             }
@@ -558,30 +555,69 @@ public class EditProfilePage {
                 }
             }
 
+            String newBirthday = "";
+            
+            int day = (int) dayDropdown.getSelectedItem();
+            String monthName = (String) monthDropdown.getSelectedItem();
+            int year = (int) yearDropdown.getSelectedItem();
+            //String newBirthday = String.format("%d %s %d", day, month, year);
+            
+            int month = getMonthNumber(monthName) -1;
+            
+            Calendar selectedCal = Calendar.getInstance();
+            selectedCal.setLenient(false);
+            selectedCal.set(year, month, day);
+            selectedCal.set(Calendar.HOUR_OF_DAY, 0);
+            selectedCal.set(Calendar.MINUTE, 0);
+            selectedCal.set(Calendar.SECOND, 0);
+            selectedCal.set(Calendar.MILLISECOND, 0);
+            
             // Load existing users data
             HashMap<String, String> userData = loadUserData();
-//            String encryptedCurrentEmail = encryptData(currentEmail); // Encrypt current email
-//            String encryptedCurrentUsername = encryptData(currentUsername); // Encrypt current username
 
             // Combine current email and username to form the key
             String key = currentEmail + ":" + currentUsername;
 
             // Check if the combined key exists in the user data map
             if (userData.containsKey(key)) {
-                // User found, update username and email
-                String encryptedCurrentEmail = encryptData(currentEmail);
-                String encryptedNewEmail = encryptData(newEmail);  // Encrypt new email
-                String encryptedNewUsername = encryptData(newUsername);  // Encrypt new username
-                String encryptedCurrentUsername = encryptData(currentUsername);
-                String encryptedNewBirthday = encryptData(newBirthday);
-                String encryptedNewGender = encryptData(newGender);
                 
-                // Save the updated username and email to the file
-                saveUpdatedDataToFile(encryptedCurrentEmail, encryptedNewEmail, encryptedCurrentUsername, encryptedNewUsername, encryptedNewBirthday, encryptedNewGender);
+                try {
+                    Date selectedDate = selectedCal.getTime();
+                    
+                    // Today's date wit time stripped
+                    Calendar todayCal = Calendar.getInstance();
+                    todayCal.set(Calendar.HOUR_OF_DAY, 0);
+                    todayCal.set(Calendar.MINUTE, 0);
+                    todayCal.set(Calendar.SECOND, 0);
+                    todayCal.set(Calendar.MILLISECOND, 0);
+                    Date todayDate = todayCal.getTime();
+                    
+                    if (selectedDate.after(todayDate)) {
+                        JOptionPane.showMessageDialog(null, "Invalid date! Please select today or past date only", "Date Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        newBirthday = String.format("%d %s %d", monthName, year); 
+                        String encryptedNewBirthday = encryptData(newBirthday);
+                        
+                        // User found, update username and email
+                        String encryptedCurrentEmail = encryptData(currentEmail);
+                        String encryptedNewEmail = encryptData(newEmail);  // Encrypt new email
+                        String encryptedNewUsername = encryptData(newUsername);  // Encrypt new username
+                        String encryptedCurrentUsername = encryptData(currentUsername);
+                        //String encryptedNewBirthday = encryptData(newBirthday);
+                        String encryptedNewGender = encryptData(newGender);
 
-                JOptionPane.showMessageDialog(frame, "Information updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.dispose();
-                new MainPage(userData);  // Refresh the main page
+                        // Save the updated username and email to the file
+                        saveUpdatedDataToFile(encryptedCurrentEmail, encryptedNewEmail, encryptedCurrentUsername, encryptedNewUsername, encryptedNewBirthday, encryptedNewGender);
+
+                        JOptionPane.showMessageDialog(frame, "Information updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        frame.dispose();
+                        new MainPage(userData);  // Refresh the main page
+                            }
+                } catch (IllegalArgumentException a) {
+                    JOptionPane.showMessageDialog(null, "Invalid date selected!", "Date Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                
             } else {
                 JOptionPane.showMessageDialog(frame, "Current username or email is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -746,7 +782,7 @@ public class EditProfilePage {
             e.printStackTrace();
             return null;
         }
-    } 
+    }
      
     // Helper method to convert month number (1-12) to month afer 
     private static String getMonthName(int month) {
