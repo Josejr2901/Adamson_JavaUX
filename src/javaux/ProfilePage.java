@@ -2,23 +2,26 @@
 package javaux;
 
 // Importing AWT classes for UI customization and event handling
-import java.awt.Color; // Represents colors to customize UI components 
-import java.awt.Cursor; // Allows changing the cursor appearance
-import java.awt.Font; // Manages font styles and sizes for text rendering
+//import java.awt.Color; // Represents colors to customize UI components 
+//import java.awt.Cursor; // Allows changing the cursor appearance
+//import java.awt.Font; // Manages font styles and sizes for text rendering
+import java.awt.*;
 
 // Import event handling classes
-import java.awt.event.ActionEvent; // Represents an action event (e.g., button clicks)
-import java.awt.event.ActionListener; //Listens for and hanldes action events
-import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events 
-import java.awt.event.MouseEvent; // Represents mouse events (e.g., clicks, movements)
+//import java.awt.event.ActionEvent; // Represents an action event (e.g., button clicks)
+//import java.awt.event.ActionListener; //Listens for and hanldes action events
+//import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events 
+//import java.awt.event.MouseEvent; // Represents mouse events (e.g., clicks, movements)
+import java.awt.event.*;
 
 // Importing Swing components for creating a graphical user interface (GUI)
-import javax.swing.BorderFactory; // Creates a border styles for UI elements
-import javax.swing.ImageIcon; // Handles icons and images in the UI
-import javax.swing.JButton; // Represents a clickable button in the UI 
-import javax.swing.JFrame; // Represents the main window of the application
-import javax.swing.JLabel; // Displays text or images in the UI
-import javax.swing.SwingConstants; // Provides constants for UI alignment
+//import javax.swing.BorderFactory; // Creates a border styles for UI elements
+//import javax.swing.ImageIcon; // Handles icons and images in the UI
+//import javax.swing.JButton; // Represents a clickable button in the UI 
+//import javax.swing.JFrame; // Represents the main window of the application
+//import javax.swing.JLabel; // Displays text or images in the UI
+//import javax.swing.SwingConstants; // Provides constants for UI alignment
+import javax.swing.*;
 
 // Definition of the ProfilePage class, which represents the user profile page
 public class ProfilePage {

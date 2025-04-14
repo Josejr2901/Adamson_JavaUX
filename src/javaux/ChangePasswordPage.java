@@ -6,17 +6,19 @@ import javax.swing.*; // Imports all Swing UI components (e.g., JFrame, JButton,
 import java.awt.*; // Imports AWT classes for UI elements (e.g., Color, Font, Cursor)
 
 /* Importing event hadling classes */
-import java.awt.event.ActionEvent; // Represents an action event (e.g, button clicks)
-import java.awt.event.ActionListener; // Listens for action events and executes code in response
-import java.awt.event.KeyAdapter; // Provides default implementation for handling keyboard events
-import java.awt.event.KeyEvent; // Represents a key event (e.g., key presses)
-import java.awt.event.MouseAdapter; // Provides default implementation for handling mouse events
-import java.awt.event.MouseEvent; // Represents a mouse event (e.g., clicks, movement)
+//import java.awt.event.ActionEvent; // Represents an action event (e.g, button clicks)
+//import java.awt.event.ActionListener; // Listens for action events and executes code in response
+//import java.awt.event.KeyAdapter; // Provides default implementation for handling keyboard events
+//import java.awt.event.KeyEvent; // Represents a key event (e.g., key presses)
+//import java.awt.event.MouseAdapter; // Provides default implementation for handling mouse events
+//import java.awt.event.MouseEvent; // Represents a mouse event (e.g., clicks, movement)
+import java.awt.event.*;
 
 /* Importing file handling and I/O operations */
 import java.io.*; // Imports all standart I/O classes (e.g., BufferedReader, FileReader, FileWriter)
-import java.util.Base64; // Provides methods for encoding and decoding Base64 data
-import java.util.HashMap; // Implements a data structure for storing key-value pairs
+//import java.util.Base64; // Provides methods for encoding and decoding Base64 data
+//import java.util.HashMap; // Implements a data structure for storing key-value pairs
+import java.util.*;
 
 /* Importing cryptographic classes for encryption and decryption */
 import javax.crypto.Cipher; // Provides encryption and decryption functionality

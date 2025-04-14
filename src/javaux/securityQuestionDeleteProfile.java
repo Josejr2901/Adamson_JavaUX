@@ -2,23 +2,26 @@
 package javaux;
 
 /* Import AWT classes for UI customization and event handling */
-import java.awt.Color; // Allows customization of UI component colors
-import java.awt.Cursor; // Enables changing the cursors appearance (e.g., hand cursor on hover)
-import java.awt.Font; // Manages font style and size for UI text rendering
+//import java.awt.Color; // Allows customization of UI component colors
+//import java.awt.Cursor; // Enables changing the cursors appearance (e.g., hand cursor on hover)
+//import java.awt.Font; // Manages font style and size for UI text rendering
+import java.awt.*;
 
 /* Importing event handling classes */
-import java.awt.event.KeyAdapter; // Provides a default implementation for handling key events
-import java.awt.event.KeyEvent; // Represents key events (e.g., key presses)
-import java.awt.event.MouseAdapter; // Provides a deafult implementation for handling mouse events
-import java.awt.event.MouseEvent; // Represents mouse actions (e.g., clicks, movement)
+//import java.awt.event.KeyAdapter; // Provides a default implementation for handling key events
+//import java.awt.event.KeyEvent; // Represents key events (e.g., key presses)
+//import java.awt.event.MouseAdapter; // Provides a deafult implementation for handling mouse events
+//import java.awt.event.MouseEvent; // Represents mouse actions (e.g., clicks, movement)
+import java.awt.event.*;
 
 /* Import file handling and I/O operations */
-import java.io.BufferedReader; // Reads text from a file efficiently 
-import java.io.BufferedWriter; // Writes text to a file efficiently
-import java.io.File; // Represents a file or a directory path
-import java.io.FileReader; // Read data from a file character by character
-import java.io.FileWriter; // Writes data to a file
-import java.io.IOException; // Handles exceptions related to input/output operations
+//import java.io.BufferedReader; // Reads text from a file efficiently 
+//import java.io.BufferedWriter; // Writes text to a file efficiently
+//import java.io.File; // Represents a file or a directory path
+//import java.io.FileReader; // Read data from a file character by character
+//import java.io.FileWriter; // Writes data to a file
+//import java.io.IOException; // Handles exceptions related to input/output operations
+import java.io.*;
 
 /* Importing file manipulation utilities */
 import java.nio.file.Files; // Provides methods for reading, writing, and manipulating files
@@ -35,14 +38,15 @@ import javax.crypto.Cipher; // Provides encryption and decryption functionality
 import javax.crypto.spec.SecretKeySpec; // Defines a secret key for encryption algorithms
 
 /* Importing Swing components for creating a graphical user interface (GUI) */
-import javax.swing.BorderFactory; // Creates border styles for UI elements
-import javax.swing.ImageIcon; // Handles icons and images in the UI
-import javax.swing.JButton; // Represents a clickable button in the UI
-import javax.swing.JFrame; // Represents the main window of the application
-import javax.swing.JLabel; // Displays text or images in the UI
-import javax.swing.JOptionPane; // Displays pop-up dialogs (alers, messages, confirmation)
-import javax.swing.JTextField; // Represents a single-line text input field
-import javax.swing.SwingConstants; // Provides constant for UI alignment (e.g., left, right, cener)e
+//import javax.swing.BorderFactory; // Creates border styles for UI elements
+//import javax.swing.ImageIcon; // Handles icons and images in the UI
+//import javax.swing.JButton; // Represents a clickable button in the UI
+//import javax.swing.JFrame; // Represents the main window of the application
+//import javax.swing.JLabel; // Displays text or images in the UI
+//import javax.swing.JOptionPane; // Displays pop-up dialogs (alers, messages, confirmation)
+//import javax.swing.JTextField; // Represents a single-line text input field
+//import javax.swing.SwingConstants; // Provides constant for UI alignment (e.g., left, right, cener)e
+import javax.swing.*;
 
 import javax.crypto.spec.*;
 import java.security.SecureRandom;
@@ -290,7 +294,7 @@ public class securityQuestionDeleteProfile {
             }
         }
         return false; // In case the failed attempts are below the max limits, the account is not blocked, and the user can keep trying to login
-    } 
+    }
     
     private HashMap<String, String> loadUserData() {
         HashMap<String, String> userData = new HashMap<>();

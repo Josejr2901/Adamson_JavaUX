@@ -1,28 +1,30 @@
 
 package javaux;
 
-// Importing all Swing components for creating a graphical user interface (GUI)
+/* Importing all Swing components for creating a graphical user interface (GUI) */
 import javax.swing.*;// Includes all swing components such as JFrame, JButton, JLabel, etc.
-
-// Importing AWT(Abstract Window Toolkit) classes for UI customization and event handling
+ 
+/* Importing AWT(Abstract Window Toolkit) classes for UI customization and event handling */
 import java.awt.*; // Includes core graphical components like Color, Font, and Cursor.
 
-// Importing even handling classes
-import java.awt.event.ActionEvent; // Represents an action event (ex. button clicks)
-import java.awt.event.ActionListener; // Listens for action events and executes code in response
-import java.awt.event.KeyAdapter; // Provides a default implementation for handling keyboards events
-import java.awt.event.KeyEvent; // Represents a key event (ex. key presses)
-import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events 
-import java.awt.event.MouseEvent; // Represents a mouse event (ex. clicks, movement)
+/* Importing even handling classes */
+//import java.awt.event.ActionEvent; // Represents an action event (ex. button clicks)
+//import java.awt.event.ActionListener; // Listens for action events and executes code in response
+//import java.awt.event.KeyAdapter; // Provides a default implementation for handling keyboards events
+//import java.awt.event.KeyEvent; // Represents a key event (ex. key presses)
+//import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events 
+//import java.awt.event.MouseEvent; // Represents a mouse event (ex. clicks, movement)
+import java.awt.event.*; 
 
-// Importing file handling and I/O operations
-import java.io.BufferedReader; // Reads text from a file efficiently
-import java.io.BufferedWriter; // Writes text to a file efficiently
-import java.io.FileReader; // Reads data from a file line by line
-import java.io.FileWriter; // Writes data to a file
-import java.io.IOException; // Handle exeptions related to input/output operations
+/* Importing file handling and I/O operations */
+//import java.io.BufferedReader; // Reads text from a file efficiently
+//import java.io.BufferedWriter; // Writes text to a file efficiently
+//import java.io.FileReader; // Reads data from a file line by line
+//import java.io.FileWriter; // Writes data to a file
+//import java.io.IOException; // Handle exeptions related to input/output operations
+import java.io.*;
 
-// Importing cryptographic classes for encryption and decryption
+/* Importing cryptographic classes for encryption and decryption */
 import javax.crypto.*; // Includes classes for encryption, decryption, and key generation
 import javax.crypto.spec.SecretKeySpec; // Represents a secret key for symetric encryption
 
@@ -35,15 +37,13 @@ import java.util.Calendar; // provides methods for working with dates and times
 // Importing collecitons
 import java.util.HashMap; // Implements a data structure for storing key-valued pairs
 
-// Importing document change event listener
-import javax.swing.event.DocumentEvent; // Represents changes in a document (ex. text input)
-import javax.swing.event.DocumentListener; // Listens for document changes and reacts accordingly
+/* Importing document change event listener */
+//import javax.swing.event.DocumentEvent; // Represents changes in a document (ex. text input)
+//import javax.swing.event.DocumentListener; // Listens for document changes and reacts accordingly
+import javax.swing.event.*;
 
-import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
-import java.util.Base64;
 
 // Definition of the SignUp class
 public class SignUp {
@@ -408,7 +408,7 @@ public class SignUp {
                     // Check if input contains only letters, numbers and spaces
                     if (!securityAnsStatus.matches("[a-zA-Z0-9 ]+")) {
                         return "Wrong format used!"; // Return error message if invalid characters are detected 
-                    }                    
+                    }
                     return null; // Return null if the input format is valid
                 }
             });
@@ -825,7 +825,7 @@ public class SignUp {
                 signUpPasswordField.setEchoChar('\u2022');
             }
         }
-    }    
+    }
 
     // Action listener for toggling the visibility of the password field
     private class PasswordVisible2 implements ActionListener {

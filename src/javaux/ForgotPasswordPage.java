@@ -9,10 +9,7 @@ import java.util.HashMap; // Import for using HashMap data structure
 import javax.crypto.Cipher; // Import for AES encryption and decryption
 import javax.crypto.spec.SecretKeySpec; // Import for specifying the AES encryption key
 
-
-import javax.crypto.Cipher;
 import javax.crypto.spec.*;
-import java.security.SecureRandom;
 
 public class ForgotPasswordPage {
     
@@ -170,7 +167,7 @@ public class ForgotPasswordPage {
             String line; //Variable to store each line read from the file
             
             // Read the file line by line
-            while ((line = br.readLine()) != null) { 
+            while ((line = br.readLine()) != null) {
                 String[] parts = line.split(","); // Split the line by commas to extract user data
                 if (parts.length > 4) { // Ensure the file has at least 4 parts per line
                     String encryptedUsername = parts[0].trim(); // Extract and trim the encrypted username

@@ -2,25 +2,28 @@
 package javaux;
  
 // Importing AWT classes for UI costomiAtion and event handling
-import java.awt.Color; // Represents colors to customize UI components
-import java.awt.Cursor; // Changes the cursor apparance 
-import java.awt.Font; // Manages font stle and size for text redering
+//import java.awt.Color; // Represents colors to customize UI components
+//import java.awt.Cursor; // Changes the cursor apparance 
+//import java.awt.Font; // Manages font stle and size for text redering
+import java.awt.*;
 
 // Importing event handling classes
-import java.awt.event.ActionEvent; // Represents an action event (e.g., button clicks)
-import java.awt.event.ActionListener; // Listens for and handles action events
-import java.awt.event.KeyAdapter; // Providesa default implementation for handling key events
-import java.awt.event.KeyEvent; // Represents key events (e.g., key presses)
-import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events
-import java.awt.event.MouseEvent; // Represents mouse events (e.g., clicks, movement)
+//import java.awt.event.ActionEvent; // Represents an action event (e.g., button clicks)
+//import java.awt.event.ActionListener; // Listens for and handles action events
+//import java.awt.event.KeyAdapter; // Providesa default implementation for handling key events
+//import java.awt.event.KeyEvent; // Represents key events (e.g., key presses)
+//import java.awt.event.MouseAdapter; // Provides a default implementation for handling mouse events
+//import java.awt.event.MouseEvent; // Represents mouse events (e.g., clicks, movement)
+import java.awt.event.*;
 
 // Importing file handling and I/O operators
-import java.io.BufferedReader; // Reads text from a file efficiently
-import java.io.BufferedWriter; // Writes text to a file efficiently
-import java.io.File; // Represents a file or directory path
-import java.io.FileReader; // Reads data to a file
-import java.io.FileWriter; // Writes data to a file
-import java.io.IOException; // Handles exceptions rekated to input/output operations
+//import java.io.BufferedReader; // Reads text from a file efficiently
+//import java.io.BufferedWriter; // Writes text to a file efficiently
+//import java.io.File; // Represents a file or directory path
+//import java.io.FileReader; // Reads data to a file
+//import java.io.FileWriter; // Writes data to a file
+//import java.io.IOException; // Handles exceptions rekated to input/output operations
+import java.io.*;
 
 // Importing date and time utilities
 import java.time.LocalDate; // Represents a date without a time-zone
@@ -38,23 +41,21 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 // Importing Swing components for creating a graphical user interface (GUI)
-import javax.swing.BorderFactory; // Creates border styles for UI elements
-import javax.swing.ButtonGroup; // Groups readio buttons to allow only one selection
-import javax.swing.ImageIcon; // Handles icons and images in the UI
-import javax.swing.JButton; // Represents a clickable button in the UI 
-import javax.swing.JComboBox; // Creates a dropdown selection list
-import javax.swing.JFrame; // Represents the main window of the application
-import javax.swing.JLabel; // Display text or images in the UI
-import javax.swing.JOptionPane; // Display pop-up dialogs (alerts, messages, confirmations)
-import javax.swing.JRadioButton; // Represents a selectable radio button
-import javax.swing.JTextField; // Represents a single-line text input field
-import javax.swing.SwingConstants; // Provides constants for UI alignment
+//import javax.swing.BorderFactory; // Creates border styles for UI elements
+//import javax.swing.ButtonGroup; // Groups readio buttons to allow only one selection
+//import javax.swing.ImageIcon; // Handles icons and images in the UI
+//import javax.swing.JButton; // Represents a clickable button in the UI 
+//import javax.swing.JComboBox; // Creates a dropdown selection list
+//import javax.swing.JFrame; // Represents the main window of the application
+//import javax.swing.JLabel; // Display text or images in the UI
+//import javax.swing.JOptionPane; // Display pop-up dialogs (alerts, messages, confirmations)
+//import javax.swing.JRadioButton; // Represents a selectable radio button
+//import javax.swing.JTextField; // Represents a single-line text input field
+//import javax.swing.SwingConstants; // Provides constants for UI alignment
+import javax.swing.*;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
-import java.util.Base64;
+import javax.crypto.spec.IvParameterSpec; 
+import java.security.SecureRandom; 
 
 // Definition of the EditProfilePage class 
 public class EditProfilePage {
