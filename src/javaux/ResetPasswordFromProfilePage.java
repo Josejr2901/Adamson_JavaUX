@@ -341,7 +341,7 @@ public class ResetPasswordFromProfilePage {
             
             //  Method triggered when a mouse button is released after being pressed 
             @Override
-            public void mouseReleased(MouseEvent e) { 
+            public void mouseReleased(MouseEvent e) {
                JButton source = (JButton) e.getSource(); // Gets the button that was released after being pressed 
                source.setForeground(Color.WHITE); // Set text color of the button to white
                source.setBackground(Color.decode("#876F4D")); // Setthe background color of the button to khaki

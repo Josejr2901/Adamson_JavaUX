@@ -44,6 +44,7 @@ import javax.swing.event.*;
 
 import javax.crypto.spec.IvParameterSpec;
 import java.security.SecureRandom;
+import java.util.Date;
 
 // Definition of the SignUp class
 public class SignUp {
@@ -778,37 +779,80 @@ public class SignUp {
                 JOptionPane.showMessageDialog(null, "This Email is already in use.", "Error", JOptionPane.ERROR_MESSAGE);
                 return; // Stop further processing if username exists
             }
-
+                        
             String question = (String) securityQuestionDropdown.getSelectedItem(); // Get selected security question by the user
             String answer = securityAnswerTxt.getText().trim(); // Get the security answer input by the user
+            
+            // Declare birthday outside of the try-catch block so it's accessible later
+            String birthday = ""; // Initialize as an empty string or set it to a default value
+            
             int day = (int) dayDropdown.getSelectedItem(); // Get the selected day item by the user
-            String month = (String) monthDropdown.getSelectedItem(); // Get the selected month item by the user
+            String monthName = (String) monthDropdown.getSelectedItem(); // Get the selected month item by the user
             int year = (int) yearDropdown.getSelectedItem(); // Get the selected year item by the user
-            String birthday = String.format("%d %s %d", day, month, year); // Create a formatted string representing the user's birthday in the format of day, month, year and assigns it ...
+            //String birthday = String.format("%d %s %d", day, month, year); // Create a formatted string representing the user's birthday in the format of day, month, year and assigns it ...
                                                                            // ... to the variable birthday %d are placeholders for integer values and %s are placeholders for string values
-            String gender = maleButton.isSelected() ? "Male" : "Female"; // Determine gender based on selection
+            // Convert month to a Calendar-compatible month number (0-based)
+            int month = getMonthNumber(monthName) - 1;
+            
+            // Create Calendar object for selected date
+            Calendar selectedCal = Calendar.getInstance();
+            selectedCal.setLenient(false); // Strict date cheking (e.g. Feb 30 will throw)
+            selectedCal.set(year, month, day);
+            selectedCal.set(Calendar.HOUR_OF_DAY, 0);
+            selectedCal.set(Calendar.MINUTE, 0);
+            selectedCal.set(Calendar.SECOND, 0);
+            selectedCal.set(Calendar.MILLISECOND, 0);
 
-            /* Encrypt the collected data */
-            String encryptedUsername = encryptData(username); // Encrypt the username
-            String encryptedEmail = encryptData(email); // Encrypt the email
-            String encryptedPassword = encryptData(password1); // Encrypt the password
-            String encryptedQuestion = encryptData(question); //Encrypt the security question
-            String encryptedAnswer = encryptData(answer); //Encrypt the security question's answer
-            String encryptedBirthday = encryptData(birthday); // Encrypt the birthday
-            String encryptedGender = encryptData(gender); // Encrypt the gender
+            try {
+                Date selectedDate = selectedCal.getTime();
+                
+                // Today's date with time stripped
+                Calendar todayCal = Calendar.getInstance();
+                todayCal.set(Calendar.HOUR_OF_DAY, 0);
+                todayCal.set(Calendar.MINUTE, 0);
+                todayCal.set(Calendar.SECOND, 0);
+                todayCal.set(Calendar.MILLISECOND, 0);
+                Date todayDate = todayCal.getTime();
+                
+                if (selectedDate.after(todayDate)) {
+                    JOptionPane.showMessageDialog(null, "Invalid date! Please select today or a past date only.", "Date Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // Valid date
+                    birthday = String.format("%d %s %d", day, monthName, year); // Set the birthday
+                    String encryptedBirthday = encryptData(birthday); // Encrypt the birthday
+                    //System.out.println("Valid birthday: " + birthday);
+                    // Proceed with saving or encrypting
+                    
+                    // Writing user to 
+                    String gender = maleButton.isSelected() ? "Male" : "Female"; // Determine gender based on selection
 
-            // Attempt to write encrypted user data to file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("user_data.txt", true))) {
-                writer.write(encryptedUsername + "," + encryptedEmail + "," + encryptedPassword + "," + encryptedQuestion + "," + encryptedAnswer + "," + encryptedBirthday + "," +encryptedGender); // Write user data
-                writer.newLine(); // add a new line after the data
-                JOptionPane.showMessageDialog(frame, "Sign up successful!"); 
+                /* Encrypt the collected data */
+                String encryptedUsername = encryptData(username); // Encrypt the username
+                String encryptedEmail = encryptData(email); // Encrypt the email
+                String encryptedPassword = encryptData(password1); // Encrypt the password
+                String encryptedQuestion = encryptData(question); //Encrypt the security question
+                String encryptedAnswer = encryptData(answer); //Encrypt the security question's answer
+                //String encryptedBirthday = encryptData(birthday); // Encrypt the birthday
+                String encryptedGender = encryptData(gender); // Encrypt the gender
+
+                // Attempt to write encrypted user data to file
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("user_data.txt", true))) {
+                    writer.write(encryptedUsername + "," + encryptedEmail + "," + encryptedPassword + "," + encryptedQuestion + "," + encryptedAnswer + "," + encryptedBirthday + "," +encryptedGender); // Write user data
+                    writer.newLine(); // add a new line after the data
+                    JOptionPane.showMessageDialog(frame, "Sign up successful!"); 
+                    frame.dispose();
+                    mainPage.refreshLoginInfo(); // Refresh login info after signup
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(frame, "Error saving data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 frame.dispose();
-                mainPage.refreshLoginInfo(); // Refresh login info after signup
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(frame, "Error saving data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                new MainPage(new HashMap<>()); // Create a new instance of the main page
+                }
+                
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(null, "Invalid date selected!", "Date Error", JOptionPane.ERROR_MESSAGE);
             }
-            frame.dispose();
-            new MainPage(new HashMap<>()); // Create a new instance of the main page
+                        
         }
     }
     
@@ -956,19 +1000,37 @@ public class SignUp {
             default: return ""; // Should not reach here, but it is there just in case
         }
     }
+        
+        private static int getMonthNumber(String monthName) {
+            switch (monthName) {
+                case "January": return 1;
+                case "February": return 2;
+                case "March": return 3;
+                case "April": return 4;
+                case "May": return 5;
+                case "June": return 6;
+                case "July": return 7;
+                case "August": return 8;
+                case "September": return 9;
+                case "October": return 10;
+                case "November": return 11;
+                case "December": return 12;
+                default: return -1; // For safety
+            }
+        }
             
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//    //Method to decrypt the data //Only used when I want to decrypt data                                                                                                      //                        
+//    //Method to decrypt the data //Only used when I want to decrypt data                                                                                                    //                        
 //    public void loadUserData() {                                                                                                                                            // 
 //        try {                                                                                                                                                               //
 //            // Simulating reading an encrypted string from a file (replace with actual file read)                                                                           //                                                                                               
-//            String encryptedUsername = "gz+bqhrD7tHAKK/lP8Bef8gaVQa85VZZte4x91e5+zk="; // Example encrypted Username                                                                            //           
-//            String encryptedEmail = "vvzuE/opqccQx2ZftTt0DtF+Dp8vwhcRm7Hu5hxgqpVY4M37lbn+6C5LkT/GWw6f"; // Example encrypted Email                                                              //
-//            String encryptedPassword = "b4s2hzmw12Gq4MDM4k09Ki2gByrWeEivrlE3wbDharA="; // Example encrypted Password                                                                            //  
-//            String encryptedQuestion = "mRIb2VFvVic1GF6/IGtp2agI0voQP40H6GvyjCTB0QA="; // Example encrypted Security Question                                                                   //  
-//            String encryptedAnswer = "wt23+/sHBKEUik1saf5Aas4OHfQP/FJzSTQDZ0vWc40=";   //Example encrypted Security Question Answer                                                             //  
-//            String encryptedBirthday = "UjKvOLnH5vxCOlZdFBFoqKbC2iIOqitBeXhToS/btMw="; // Example encrypted Birthday                                                                            //                
-//            String encryptedGender = "vbiIUqqJwsjvqmCHJ3IrAotO2m1q8URMh+lIoTMMGMY="; // Example encrypted Gender                                                                                //                                                                                                                                 
+//            String encryptedUsername = "gz+bqhrD7tHAKK/lP8Bef8gaVQa85VZZte4x91e5+zk="; // Example encrypted Username                                                        //           
+//            String encryptedEmail = "vvzuE/opqccQx2ZftTt0DtF+Dp8vwhcRm7Hu5hxgqpVY4M37lbn+6C5LkT/GWw6f"; // Example encrypted Email                                          //
+//            String encryptedPassword = "b4s2hzmw12Gq4MDM4k09Ki2gByrWeEivrlE3wbDharA="; // Example encrypted Password                                                        //  
+//            String encryptedQuestion = "mRIb2VFvVic1GF6/IGtp2agI0voQP40H6GvyjCTB0QA="; // Example encrypted Security Question                                               //  
+//            String encryptedAnswer = "wt23+/sHBKEUik1saf5Aas4OHfQP/FJzSTQDZ0vWc40=";   //Example encrypted Security Question Answer                                         //  
+//            String encryptedBirthday = "UjKvOLnH5vxCOlZdFBFoqKbC2iIOqitBeXhToS/btMw="; // Example encrypted Birthday                                                        //                
+//            String encryptedGender = "vbiIUqqJwsjvqmCHJ3IrAotO2m1q8URMh+lIoTMMGMY="; // Example encrypted Gender                                                            //                                                                                                                                 
 //                                                                                                                                                                            // 
 //            // Decrypt the data using the decryptData method                                                                                                                //
 //            String decryptedUsername = decryptData(encryptedUsername);                                                                                                      //                           

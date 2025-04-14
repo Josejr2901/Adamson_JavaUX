@@ -389,7 +389,7 @@ public class securityQuestionDeleteProfile {
             // Displays an error message in case of an issue deleting account data
             JOptionPane.showMessageDialog(frame, "Error occurred while deleting account data", "Error", JOptionPane.ERROR_MESSAGE); 
         }
-    } 
+    }
     
     public static String encryptData(String data) {
         try {

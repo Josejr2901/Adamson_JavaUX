@@ -629,26 +629,6 @@ public class EditProfilePage {
             }
             return false; // Username not found
         }
-
-//    // Helper method to load user data from file
-//    private HashMap<String, String> loadUserData() {
-//        HashMap<String, String> userData = new HashMap<>();
-//        try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] parts = line.split(",");
-//                if (parts.length >= 3) {
-//                    String encryptedUsername = parts[0];  // Encrypted username
-//                    String encryptedEmail = parts[1];  // Encrypted email
-//                    // Storing username and email combination as the key with the rest of the line as value
-//                    userData.put(encryptedEmail + ":" + encryptedUsername, line);
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return userData;
-//    }
         
         private HashMap<String, String> loadUserData() {
             HashMap<String, String> userData = new HashMap<>();
@@ -786,5 +766,23 @@ public class EditProfilePage {
                 default: return ""; // Should not reach here, but it is there just in case
             }
         }
+    
+    private static int getMonthNumber(String monthName) {
+        switch (monthName) {
+            case "January": return 1;
+            case "February": return 2;
+            case "March": return 3;
+            case "April": return 4;
+            case "May": return 5;
+            case "June": return 6;
+            case "July": return 7;
+            case "August": return 8;
+            case "September": return 9;
+            case "October": return 10;
+            case "November": return 11;
+            case "December": return 12;
+            default: return -1;
+        }
+    }
     
 }
