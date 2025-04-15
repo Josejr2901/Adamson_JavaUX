@@ -54,6 +54,8 @@ import java.security.SecureRandom;
 public class securityQuestionDeleteProfile {
     
     private JFrame frame;
+    private ImageIcon visible, notVisible;
+    private JCheckBox passwordVisibleCheckBox;
     private JLabel titleLabel, securityQuestionLabel, emailLabel, passwordLabel;
     private JTextField securityAnswerTxt, emailTxt;
     private JPasswordField passwordTxt;
@@ -93,6 +95,9 @@ public class securityQuestionDeleteProfile {
         ImageIcon image = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\adamson-logo.png"); 
         frame.setIconImage(image.getImage()); // Set the application window icon
         
+        visible = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\visible1.png");
+        notVisible = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\notVisible1.png");
+        
         // Craete and configure the title label
         titleLabel = new JLabel("Please answer before proceding"); // Set the label text
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center-align the text 
@@ -131,6 +136,14 @@ public class securityQuestionDeleteProfile {
         passwordTxt = new JPasswordField();
         passwordTxt.setHorizontalAlignment(JTextField.CENTER);
         passwordTxt.setBounds(90, 280, 200, 20);
+        
+        passwordVisibleCheckBox = new JCheckBox();
+        passwordVisibleCheckBox.setBackground(Color.decode("#222222"));
+        passwordVisibleCheckBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        passwordVisibleCheckBox.setBounds(295, 280, 20, 20);
+        passwordVisibleCheckBox.setIcon(notVisible);
+        passwordVisibleCheckBox.setSelectedIcon(visible);
+        passwordVisibleCheckBox.addActionListener(new PasswordVisible());
         
         // Create and configure the confirm button
         confirmButton = new JButton("Confirm"); // Create a button labaled "Confirm"
@@ -324,6 +337,7 @@ public class securityQuestionDeleteProfile {
         frame.add(emailTxt);
         frame.add(passwordLabel);
         frame.add(passwordTxt);
+        frame.add(passwordVisibleCheckBox);
         frame.add(confirmButton);
         frame.add(cancelButton);
         frame.setVisible(true);        
@@ -437,6 +451,17 @@ public class securityQuestionDeleteProfile {
             
             // Displays an error message in case of an issue deleting account data
             JOptionPane.showMessageDialog(frame, "Error occurred while deleting account data", "Error", JOptionPane.ERROR_MESSAGE); 
+        }
+    }
+    
+    private class PasswordVisible implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (passwordVisibleCheckBox.isSelected()) {
+                passwordTxt.setEchoChar((char)0);
+            } else {
+                passwordTxt.setEchoChar('\u2022');
+            }
         }
     }
     
