@@ -54,8 +54,9 @@ import java.security.SecureRandom;
 public class securityQuestionDeleteProfile {
     
     private JFrame frame;
-    private JLabel titleLabel, securityQuestionLabel;
-    private JTextField securityAnswerTxt;
+    private JLabel titleLabel, securityQuestionLabel, emailLabel, passwordLabel;
+    private JTextField securityAnswerTxt, emailTxt;
+    private JPasswordField passwordTxt;
     private JButton confirmButton, cancelButton;
     private int failedAttempts = 0; // To keep track of how many times the user has attempted to log in with an incorrect password
     private long blockTime = 0; // Stores the time stamp of when the account was blocked after reaching the maximum number of failed attempts. Used in conjunction with BLOCK_DURATION to determine if the user is currently locked out
@@ -74,14 +75,14 @@ public class securityQuestionDeleteProfile {
         
         // Retrieve user details from the User object
         String username = user.getUsername(); // Get the username        
-        //String currentUsername = user.getUsername(); // Store current username
+        String currentPassword = user.getPassword();
         String currentEmail = user.getEmail(); // Get the user's email
         String securityQuestion = user.getQuestion(); // Get the security question set by the user
         String rightAnswer = user.getAnswer(); // Get the answer to the security question
         
         // Create and configure the JFrame for the delete account prompt
         frame = new JFrame("Delete Account ADAMSON-AI"); //Set the window title
-        frame.setSize(400, 360); // Set the window size (x, y)
+        frame.setSize(400, 500); // Set the window size (x, y)
         frame.getContentPane().setBackground(Color.decode("#222222")); // Set the background color to dark grey 
         frame.setLayout(null); // Use absolute positioning (no layer manager)
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit the prgram when the window is closed
@@ -109,7 +110,27 @@ public class securityQuestionDeleteProfile {
         // Create and configure the security answer input field
         securityAnswerTxt = new JTextField();  // Create an input field for security answer
         securityAnswerTxt.setHorizontalAlignment(JTextField.CENTER); // Center-align the text 
-        securityAnswerTxt.setBounds(90, 130, 200, 20); // Set position and size
+        securityAnswerTxt.setBounds(90, 120, 200, 20); // Set position and size
+        
+        emailLabel = new JLabel("Enter your email");
+        emailLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        emailLabel.setForeground(Color.decode("#876F4D"));
+        emailLabel.setFont(new Font(null, Font.BOLD, 16));
+        emailLabel.setBounds(90, 170, 200, 20);
+        
+        emailTxt = new JTextField(); 
+        emailTxt.setHorizontalAlignment(JTextField.CENTER);
+        emailTxt.setBounds(90, 200, 200, 20);
+        
+        passwordLabel = new JLabel("Re-enter your Password");
+        passwordLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        passwordLabel.setForeground(Color.decode("#876F4D"));
+        passwordLabel.setFont(new Font(null, Font.BOLD, 16));
+        passwordLabel.setBounds(90, 250, 200, 20);
+        
+        passwordTxt = new JPasswordField();
+        passwordTxt.setHorizontalAlignment(JTextField.CENTER);
+        passwordTxt.setBounds(90, 280, 200, 20);
         
         // Create and configure the confirm button
         confirmButton = new JButton("Confirm"); // Create a button labaled "Confirm"
@@ -120,12 +141,14 @@ public class securityQuestionDeleteProfile {
         confirmButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1)); // Add a white border 
         confirmButton.setBackground(Color.decode("#876F4D")); // Set the background color (goldish brown)
         confirmButton.setForeground(Color.WHITE); // Set text color to white
-        confirmButton.setBounds(50, 200, 280, 30); // Set position and size
+        confirmButton.setBounds(50, 340, 280, 30); // Set position and size
          
         // Add an action listener for the confirm button
         confirmButton.addActionListener(e -> {
             
             String securityAnswer = securityAnswerTxt.getText().trim(); // Retrieve the user-inputted answer and remove spaces
+            String email = emailTxt.getText().trim();
+            String password = String.valueOf(passwordTxt.getPassword());
 
             // Check if the account is locked due to multiple failed attempts
             if (isBlocked()) {
@@ -135,10 +158,11 @@ public class securityQuestionDeleteProfile {
             }
 
             // Validate the security answer input
-            if (securityAnswer.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Please enter the answer to proceed", "Enter an answer", JOptionPane.INFORMATION_MESSAGE);
-            } else if (!securityAnswer.equals(rightAnswer)) { // If the answer is incorrect
-                JOptionPane.showMessageDialog(frame, "Invalid Password. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
+            if (securityAnswer.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please fill all the fields to proceed", "Enter an answer", JOptionPane.INFORMATION_MESSAGE);
+            } else if (!securityAnswer.equals(rightAnswer) || !email.equals(currentEmail) || !password.equals(currentPassword)) { // If the answer is incorrect
+                JOptionPane.showMessageDialog(frame, "Invalid information entered. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
+                
                 failedAttempts++; // Increase the failed attempt counter
 
                 // Lock the account if the maximum number of failed attempts is reached 
@@ -191,7 +215,7 @@ public class securityQuestionDeleteProfile {
         cancelButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
         cancelButton.setBackground(Color.decode("#876F4D"));
         cancelButton.setForeground(Color.WHITE);
-        cancelButton.setBounds(50, 240, 280, 30);
+        cancelButton.setBounds(50, 380, 280, 30);
         
         // Add an aciton listener to the cancel button to handle user interaction
         cancelButton.addActionListener(e -> {
@@ -216,6 +240,27 @@ public class securityQuestionDeleteProfile {
                 }
             }
         });
+        
+        emailTxt.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // If the key is pressed, simulate a click on the confirm button
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                confirmButton.doClick();
+                }
+            }
+        });
+        
+        passwordTxt.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // If the key is pressed, simulate a click on the confirm button
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    confirmButton.doClick();
+                }
+            }
+        });
+        
         
         // Create a MouseAdapter object to handle mouse events for multiple buttons
         MouseAdapter listener = new MouseAdapter() {
@@ -275,6 +320,10 @@ public class securityQuestionDeleteProfile {
         frame.add(titleLabel);
         frame.add(securityQuestionLabel);
         frame.add(securityAnswerTxt);
+        frame.add(emailLabel);
+        frame.add(emailTxt);
+        frame.add(passwordLabel);
+        frame.add(passwordTxt);
         frame.add(confirmButton);
         frame.add(cancelButton);
         frame.setVisible(true);        
