@@ -477,7 +477,7 @@ public class MainPage extends Buttons {
                 failedAttempts++; // Increment failed attempts counter if user enters right username but wrong password
                 
                 // If statment in case the failed attempts reach the maximum, then the following will be done:
-                if (failedAttempts >= MAX_FAILED_ATTEMPTS) { 
+                if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
                     blockTime = System.currentTimeMillis(); // Record the current time and date as a unix timestamp when the account is blocked, by doin this the program can calculate how...
                                                             // long  the account has been locked. Without this timestamp, it wouldn't know when to allow the user to try logging in again.
                     BLOCK_DURATION *= 2; // This is two double the time duration of each block
