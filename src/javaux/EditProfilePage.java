@@ -595,7 +595,7 @@ public class EditProfilePage {
                     if (selectedDate.after(todayDate)) {
                         JOptionPane.showMessageDialog(null, "Invalid date! Please select today or past date only", "Date Error", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        newBirthday = String.format("%d %s %d", monthName, year); 
+                        newBirthday = String.format("%d %s %d", day, monthName, year); 
                         String encryptedNewBirthday = encryptData(newBirthday);
                         
                         // User found, update username and email
