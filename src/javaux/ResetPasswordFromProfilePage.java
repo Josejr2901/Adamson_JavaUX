@@ -483,7 +483,7 @@ public class ResetPasswordFromProfilePage {
                 JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-    } 
+    }
     
     // Method to lead user data from "user_data.txt" file
     private HashMap<String, String> loadUserData() {

@@ -219,3 +219,35 @@ try {
             }
         }
 */
+
+
+/* 
+
+import javax.swing.*;
+import java.awt.*;
+
+public class CustomJOptionPane {
+    public static void main(String[] args) {
+        // Set background color for JOptionPane
+        UIManager.put("Panel.background", new Color(30, 30, 30)); // Dark gray
+        UIManager.put("OptionPane.background", new Color(30, 30, 30)); // Dialog background
+
+        // Set foreground (font) color
+        UIManager.put("OptionPane.messageForeground", Color.WHITE); // Text color
+
+        // Optional: set font
+        UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 14));
+
+        // Show the customized dialog
+        JFrame frame = new JFrame();
+        JOptionPane.showMessageDialog(
+            frame,
+            "Error loading user data: Something went wrong!",
+            "Error",
+            JOptionPane.WARNING_MESSAGE
+        );
+    }
+}
+
+
+*/

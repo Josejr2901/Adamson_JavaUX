@@ -59,7 +59,7 @@ public class securityQuestionDeleteProfile {
     private JLabel titleLabel, securityQuestionLabel, emailLabel, passwordLabel;
     private JTextField securityAnswerTxt, emailTxt;
     private JPasswordField passwordTxt;
-    private JButton confirmButton, cancelButton;
+    private JButton deleteAccountButton, cancelButton;
     private int failedAttempts = 0; // To keep track of how many times the user has attempted to log in with an incorrect password
     private long blockTime = 0; // Stores the time stamp of when the account was blocked after reaching the maximum number of failed attempts. Used in conjunction with BLOCK_DURATION to determine if the user is currently locked out
     private final int MAX_FAILED_ATTEMPTS = 3; // A constant that defines the maximum number of allowed failed login attempts before the account is locked
@@ -146,18 +146,18 @@ public class securityQuestionDeleteProfile {
         passwordVisibleCheckBox.addActionListener(new PasswordVisible());
         
         // Create and configure the confirm button
-        confirmButton = new JButton("Confirm"); // Create a button labaled "Confirm"
-        confirmButton.setContentAreaFilled(false); // Make the button background transparent
-        confirmButton.setOpaque(true); // Enable opacity for background color
-        confirmButton.setFocusable(false); // Remove focus border when clicked
-        confirmButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Change cursor to a hand when hovered
-        confirmButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1)); // Add a white border 
-        confirmButton.setBackground(Color.decode("#876F4D")); // Set the background color (goldish brown)
-        confirmButton.setForeground(Color.WHITE); // Set text color to white
-        confirmButton.setBounds(50, 340, 280, 30); // Set position and size
+        deleteAccountButton = new JButton("Delete Account"); // Create a button labaled "Confirm"
+        deleteAccountButton.setContentAreaFilled(false); // Make the button background transparent
+        deleteAccountButton.setOpaque(true); // Enable opacity for background color
+        deleteAccountButton.setFocusable(false); // Remove focus border when clicked
+        deleteAccountButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Change cursor to a hand when hovered
+        deleteAccountButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1)); // Add a white border 
+        deleteAccountButton.setBackground(Color.decode("#876F4D")); // Set the background color (goldish brown)
+        deleteAccountButton.setForeground(Color.WHITE); // Set text color to white
+        deleteAccountButton.setBounds(50, 340, 280, 30); // Set position and size
          
         // Add an action listener for the confirm button
-        confirmButton.addActionListener(e -> {
+        deleteAccountButton.addActionListener(e -> {
             
             String securityAnswer = securityAnswerTxt.getText().trim(); // Retrieve the user-inputted answer and remove spaces
             String email = emailTxt.getText().trim();
@@ -249,7 +249,7 @@ public class securityQuestionDeleteProfile {
             public void keyPressed(KeyEvent e) {
                 // If the key is pressed, simulate a click on the confirm button
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    confirmButton.doClick(); // Triggers the confirm button action
+                    deleteAccountButton.doClick(); // Triggers the confirm button action
                 }
             }
         });
@@ -259,7 +259,7 @@ public class securityQuestionDeleteProfile {
             public void keyPressed(KeyEvent e) {
                 // If the key is pressed, simulate a click on the confirm button
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                confirmButton.doClick();
+                deleteAccountButton.doClick();
                 }
             }
         });
@@ -269,7 +269,7 @@ public class securityQuestionDeleteProfile {
             public void keyPressed(KeyEvent e) {
                 // If the key is pressed, simulate a click on the confirm button
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    confirmButton.doClick();
+                    deleteAccountButton.doClick();
                 }
             }
         });
@@ -293,7 +293,7 @@ public class securityQuestionDeleteProfile {
                 JButton source = (JButton) e.getSource(); // Get the button that was pressed
                 source.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Keep the cursor as a hand icon
                 source.setBackground(Color.WHITE); // Set the background color of the button to white
-                source.setForeground(Color.decode("8A6E4B")); // Set the text color of the button to a Taupe color (Brown gold)
+                source.setForeground(Color.decode("#8A6E4B")); // Set the text color of the button to a Taupe color (Brown gold)
             }
             
             // Method triggered when the mouse is released after being pressed
@@ -326,7 +326,7 @@ public class securityQuestionDeleteProfile {
         };
         
         // Add same MouseAdapter (listener) to multiple buttons to apply behavior
-        confirmButton.addMouseListener(listener);
+        deleteAccountButton.addMouseListener(listener);
         cancelButton.addMouseListener(listener); 
         
         // Add all components to the frame to make them visible
@@ -338,7 +338,7 @@ public class securityQuestionDeleteProfile {
         frame.add(passwordLabel);
         frame.add(passwordTxt);
         frame.add(passwordVisibleCheckBox);
-        frame.add(confirmButton);
+        frame.add(deleteAccountButton);
         frame.add(cancelButton);
         frame.setVisible(true);        
     }
