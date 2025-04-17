@@ -238,6 +238,13 @@ public class CustomJOptionPane {
         // Optional: set font
         UIManager.put("OptionPane.messageFont", new Font("Arial", Font.BOLD, 14));
 
+        // Customize buttons
+        UIManager.put("Button.background", new Color(70, 70, 70));  // Button background
+        UIManager.put("Button.foreground", Color.WHITE);            // Button text color
+        UIManager.put("Button.font", new Font("Arial", Font.PLAIN, 13));
+        UIManager.put("Button.border", BorderFactory.createLineBorder(Color.WHITE));
+
+
         // Show the customized dialog
         JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(
@@ -248,6 +255,8 @@ public class CustomJOptionPane {
         );
     }
 }
+
+
 
 
 */

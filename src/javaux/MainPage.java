@@ -88,6 +88,18 @@ public class MainPage extends Buttons {
     
     public MainPage(Map<String, String> loginInfoOriginal) {
         
+        UIManager.put("Panel.background", Color.decode("#222222"));
+        UIManager.put("OptionPane.background", Color.decode("#222222"));
+
+        UIManager.put("OptionPane.messageForeground", Color.WHITE);
+        UIManager.put("OptionPane.messageFont", new Font(null, Font.BOLD, 13));
+        
+        UIManager.put("Button.background", Color.decode("#876F4D"));
+        UIManager.put("Button.foreground", Color.WHITE);
+        //UIManager.put("Button.font", new Font("Arial", Font.PLAIN, 20));
+        UIManager.put("Button.border", BorderFactory.createLineBorder(Color.WHITE));
+        UIManager.put("Button.margin", new Insets(20, 20, 20, 20));
+        
         userData = new HashMap<>(); // Initializes user data map.
         loadUserData(); // Load user data on startup
 
@@ -451,6 +463,7 @@ public class MainPage extends Buttons {
     private class LogInAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+                                    
             // Retrieve the entered username and password in the JTextFields by the user
             String username = usernameTxt.getText().trim();
             String password = String.valueOf(mainPasswordField.getPassword());
