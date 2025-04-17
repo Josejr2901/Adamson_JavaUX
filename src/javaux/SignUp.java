@@ -210,7 +210,7 @@ public class SignUp {
                     return null; // No issues found with the email
                 }
             });
-           
+                       
             // Label to display validation icons for the email field
             emailIcon = new JLabel();
             emailIcon.setBounds(414, 140, 20, 20);
@@ -796,7 +796,7 @@ public class SignUp {
             
             // Create Calendar object for selected date
             Calendar selectedCal = Calendar.getInstance();
-            selectedCal.setLenient(false); // Strict date cheking (e.g. Feb 30 will throw)
+            selectedCal.setLenient(false); // Strict date cheking (e.g. Feb 30 will give error)
             selectedCal.set(year, month, day);
             selectedCal.set(Calendar.HOUR_OF_DAY, 0);
             selectedCal.set(Calendar.MINUTE, 0);
@@ -852,7 +852,6 @@ public class SignUp {
             } catch (IllegalArgumentException e) {
                 JOptionPane.showMessageDialog(null, "Invalid date selected!", "Date Error", JOptionPane.ERROR_MESSAGE);
             }
-                        
         }
     }
     
@@ -1024,11 +1023,11 @@ public class SignUp {
 //    public void loadUserData() {                                                                                                                                            // 
 //        try {                                                                                                                                                               //
 //            // Simulating reading an encrypted string from a file (replace with actual file read)                                                                           //                                                                                               
-//            String encryptedUsername = "gz+bqhrD7tHAKK/lP8Bef8gaVQa85VZZte4x91e5+zk="; // Example encrypted Username                                                        //           
-//            String encryptedEmail = "vvzuE/opqccQx2ZftTt0DtF+Dp8vwhcRm7Hu5hxgqpVY4M37lbn+6C5LkT/GWw6f"; // Example encrypted Email                                          //
-//            String encryptedPassword = "b4s2hzmw12Gq4MDM4k09Ki2gByrWeEivrlE3wbDharA="; // Example encrypted Password                                                        //  
-//            String encryptedQuestion = "mRIb2VFvVic1GF6/IGtp2agI0voQP40H6GvyjCTB0QA="; // Example encrypted Security Question                                               //  
-//            String encryptedAnswer = "wt23+/sHBKEUik1saf5Aas4OHfQP/FJzSTQDZ0vWc40=";   //Example encrypted Security Question Answer                                         //  
+//            String encryptedUsername = "2BcUT0PYhuRfLdXnqnfcY/LpXMRL6UB2cbxXgOwFFZo="; // Example encrypted Username                                                        //           
+//            String encryptedEmail = "2QMfhNiTUIQzfs32yB/OO2lKOLaa9YcFW3VzmXL3+/Y="; // Example encrypted Email                                                              //
+//            String encryptedPassword = "9+eT71lAUAnX4jvuNoX0Dp9+4FABheR4rX70uy6OEM4="; // Example encrypted Password                                                        //  
+//            String encryptedQuestion = "66V+1US6mkscxYfqpC732HjHN1dDQJhYymFjR8Msoog="; // Example encrypted Security Question                                               //  
+//            String encryptedAnswer = "0uGZoX+AELqOfjUpxTeOVfwIcUmcP1+8tOMjO49lIbM=";   //Example encrypted Security Question Answer                                         //  
 //            String encryptedBirthday = "UjKvOLnH5vxCOlZdFBFoqKbC2iIOqitBeXhToS/btMw="; // Example encrypted Birthday                                                        //                
 //            String encryptedGender = "vbiIUqqJwsjvqmCHJ3IrAotO2m1q8URMh+lIoTMMGMY="; // Example encrypted Gender                                                            //                                                                                                                                 
 //                                                                                                                                                                            // 
