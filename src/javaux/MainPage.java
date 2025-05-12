@@ -257,7 +257,7 @@ public class MainPage extends Buttons {
         
         checkBox.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) { 
+            public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) { // Check if the Enter key is pressed
                     loginButton.doClick(); // Simulate a click on the login button
                 }
@@ -540,7 +540,7 @@ public class MainPage extends Buttons {
     private boolean isBlocked() {
         if (failedAttempts >= MAX_FAILED_ATTEMPTS) { // To check if the number of failed attempts has reached the maximum allowed
             long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000;
-            if (timeLeft > 0) { // This determines if there's still time left in the lock duration, and if ther is, then it returns true and the  account stays locked
+            if (timeLeft > 0) { // This determines if there's still time left in the lock duration, and if there is, then it returns true and the  account stays locked
                 return true;
             } else {                    // In the case that the time of lock duration has expired
                 failedAttempts = 0;     // The failed attempts and ...

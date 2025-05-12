@@ -63,7 +63,7 @@ public class securityQuestionDeleteProfile {
     private int failedAttempts = 0; // To keep track of how many times the user has attempted to log in with an incorrect password
     private long blockTime = 0; // Stores the time stamp of when the account was blocked after reaching the maximum number of failed attempts. Used in conjunction with BLOCK_DURATION to determine if the user is currently locked out
     private final int MAX_FAILED_ATTEMPTS = 3; // A constant that defines the maximum number of allowed failed login attempts before the account is locked
-    private final long BLOCK_DURATION = 60000; // Defining the lock duration in milliseconds *1 minute* [60 seconds * 1000 milliseconds = 1 minute]
+    private int BLOCK_DURATION = 30000; // Defining the lock duration in milliseconds *1 minute* [60 seconds * 1000 milliseconds = 1 minute]
     
     // AES key for encryption and decryption 
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
@@ -165,8 +165,10 @@ public class securityQuestionDeleteProfile {
 
             // Check if the account is locked due to multiple failed attempts
             if (isBlocked()) {
-                long timeleft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
-                JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + timeleft + " seconds"); // Alert the user 
+                long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
+                long minutes = timeLeft / 60; // calculate minutes, this extract minutes from total seconds
+                long seconds = timeLeft % 60; // calculate remaining seconds, this extract remaining seconds after minutes 
+                JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s)", "Wait", JOptionPane.INFORMATION_MESSAGE); // Alert the user 
                 return; // Stop further execution
             }
 
@@ -182,9 +184,11 @@ public class securityQuestionDeleteProfile {
                 if(failedAttempts >= MAX_FAILED_ATTEMPTS) {
                     blockTime = System.currentTimeMillis(); // Record the lock time
 
+                    BLOCK_DURATION *= 2;
+                    
                     saveLockStatus(username, blockTime); // Save the lock status to prevent further attemmpts 
 
-                    JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for 1 minute", "Account temporary blocked", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for " + BLOCK_DURATION / 60000 + " minute(s)", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else { // If the answer is correct
                 failedAttempts = 0; // Reset the failed attempts counter
@@ -527,18 +531,21 @@ public class securityQuestionDeleteProfile {
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(","); // Splits the line into an array using a comma as a delimeter
                 
-                if (parts.length == 2) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                if (parts.length == 3) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
                     String lockedUser = parts[0]; // Extracts the username that was locked
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
+                    int savedBlockDuration = Integer.parseInt(parts[2]);
                     
                     // Checks if the lock duration has not yet expired
-                    if ((lockedTime + BLOCK_DURATION) > System.currentTimeMillis()) {
+                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
                         blockTime = lockedTime; // Updates the blockTime with the stored lock timestamp
                         failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to the maximum limit
+                        BLOCK_DURATION = savedBlockDuration;
                     } else {
                         // If the lock duration has expired, reset the lock staus
                         failedAttempts = 0; // Resets the failed attempts counter
                         blockTime = 0; // Clears the block timestamp
+                        BLOCK_DURATION = 60000;
                         new File("delete_user_lock_status.txt").delete(); // Deletes the lock status file
                     }
                 }
@@ -552,9 +559,9 @@ public class securityQuestionDeleteProfile {
     // Method to save the lock status of a user to a fil. This is to prevent the lockout information even after the program is closed 
     private void saveLockStatus(String username, long blockTime) {
         
-        // Opens the file "delete_user_lock_dtatus.txt" for writing using a BufferedWriter
+        // Opens the file "delete_user_lock_status.txt" for writing using a BufferedWriter
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("delete_user_lock_status.txt"))) {
-            writer.write(username + "," + blockTime); // Writes the username and block timestamp, separated by comma
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION); // Writes the username and block timestamp, separated by comma
         } catch (IOException e) {
             // Catches and prints an enrror message if there is an issue writing to a file
             e.printStackTrace();

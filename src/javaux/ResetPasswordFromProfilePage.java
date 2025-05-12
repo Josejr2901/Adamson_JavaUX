@@ -1,6 +1,6 @@
  
 package javaux;
- 
+
 // Import all Swing components for creating a graphical user interface (GUI)
 import javax.swing.*; // Includes all Swing UI components like JFrame, JButton, JLabel, JTextField, etc.
 
@@ -47,6 +47,10 @@ public class ResetPasswordFromProfilePage {
     private JButton resetPasswordButton, cancelButton;
     private JCheckBox passwordVisibleCB1, passwordVisibleCB2;
     private ImageIcon image, visible, notVisible;
+    private int failedAttempts = 0;
+    private long blockTime = 0;
+    private final int MAX_FAILED_ATTEMPTS = 3;
+    private int BLOCK_DURATION = 30000;
     
     private User user;
      
@@ -58,11 +62,13 @@ public class ResetPasswordFromProfilePage {
     // Constructor for the ResetPasswordFromProfile class
     public ResetPasswordFromProfilePage(User user) {
         
+        loadLockStatus();
+        
         /* Retrieve user detair from user object */
-        String username = user.getUsername(); // Retrieve the username from the user object
-        String email = user.getEmail(); // Retrieve the email from the user object
-        String securityQuestion = user.getQuestion(); // Retrieve the security question from the object
-        String securityQuestionAnswer = user.getAnswer(); // Retrieve the security anser from the object
+        String currentSavedUsername = user.getUsername(); // Retrieve the username from the user object
+        String currentSavedEmail = user.getEmail(); // Retrieve the email from the user object
+        String currentSavedSecurityQuestion = user.getQuestion(); // Retrieve the security question from the object
+        String currentSavedSecurityQuestionAnswer = user.getAnswer(); // Retrieve the security anser from the object
         
         frame = new JFrame("ResetPassword - ADAMSON AI");
         frame.setSize(420, 440);
@@ -78,7 +84,7 @@ public class ResetPasswordFromProfilePage {
         visible = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\visible1.png");
         notVisible = new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\notVisible1.png");
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        resetPasswordLabel = new JLabel("Reset Password of " + username);
+        resetPasswordLabel = new JLabel("Reset Password of " + currentSavedUsername);
         resetPasswordLabel.setForeground(Color.WHITE);
         resetPasswordLabel.setHorizontalAlignment(SwingConstants.CENTER);
         resetPasswordLabel.setFont(new Font(null, Font.BOLD, 18));
@@ -88,7 +94,7 @@ public class ResetPasswordFromProfilePage {
         securityQuestionLabel.setForeground(Color.WHITE);
         securityQuestionLabel.setBounds(50, 90, 120, 20);
 
-        questionLabel = new JLabel(securityQuestion);
+        questionLabel = new JLabel(currentSavedSecurityQuestion);
         questionLabel.setForeground(Color.decode("#876F4D"));
         questionLabel.setHorizontalAlignment(SwingConstants.CENTER);
         questionLabel.setBounds(180, 90, 150, 20);
@@ -128,9 +134,9 @@ public class ResetPasswordFromProfilePage {
                 /* Determine which icon to display based on the validity of input */
                 if (answerIcn.isEmpty()) { // No icon if input is empty
                     answerIcon.setIcon(null);
-                } else if (answerIcn.equals(securityQuestionAnswer)) { // Set the "correct icon" if the security answer entered matches the stored answer
+                } else if (answerIcn.equals(currentSavedSecurityQuestionAnswer)) { // Set the "correct icon" if the security answer entered matches the stored answer
                     answerIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\CorrectGold.png")); 
-                } else if (!answerIcn.equals(securityQuestionAnswer)) { // Set the "incorrect icon" if the security answer entered does not match the stored answer
+                } else if (!answerIcn.equals(currentSavedSecurityQuestionAnswer)) { // Set the "incorrect icon" if the security answer entered does not match the stored answer
                     answerIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\IncorrectGold.png"));
                 }
             }
@@ -140,7 +146,7 @@ public class ResetPasswordFromProfilePage {
                 String ansStatus = securityAnswerTxt.getText().trim(); // Get the trimmed text input 
                 
                 // Check if input matches the stored security answer or not
-                if (!ansStatus.equals(securityQuestionAnswer)) {
+                if (!ansStatus.equals(currentSavedSecurityQuestionAnswer)) {
                     return "Incorrect answer!"; // Return null if input does not match the stored security answer
                 }
                 return null; // Return null if the input security answer is correct
@@ -186,9 +192,9 @@ public class ResetPasswordFromProfilePage {
                 /* Determine which icon to display based on the validity of inputs */
                 if (emailIcn.isEmpty()) { // No icon if input is empty
                     emailIcon.setIcon(null);
-                } else if (emailIcn.equals(email)) { // Set the "Correct icon" if the email entered matches the stored email
+                } else if (emailIcn.equals(currentSavedEmail)) { // Set the "Correct icon" if the email entered matches the stored email
                     emailIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\CorrectGold.png"));
-                } else if (!emailIcn.equals(email)) { // Set the "Incorrect icon" if the email entered does not match the stored email
+                } else if (!emailIcn.equals(currentSavedEmail)) { // Set the "Incorrect icon" if the email entered does not match the stored email
                     emailIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\IncorrectGold.png"));
                 }
             }
@@ -198,7 +204,7 @@ public class ResetPasswordFromProfilePage {
                 String emailSts = emailTxt.getText().trim(); // Get the trimmed text input
                 
                 // Check if input matches the stored email or not
-                if (!emailSts.equals(email)) {
+                if (!emailSts.equals(currentSavedEmail)) {
                     return "Wrong email!"; // Return null if the input does not match the store email
                 }
                 return null; // Return null if the input email is exists
@@ -247,7 +253,87 @@ public class ResetPasswordFromProfilePage {
         resetPasswordButton.setBackground(Color.decode("#876F4D"));
         resetPasswordButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
         resetPasswordButton.setForeground(Color.WHITE);
-        resetPasswordButton.addActionListener(new ResetPasswordAction());
+        resetPasswordButton.addActionListener(e -> {
+            
+            // Retrieve and trim input values from text fields
+            String currentEmail = emailTxt.getText().trim();
+            String currentAnswer = securityAnswerTxt.getText().trim();
+            String newPassword = new String(newPasswordField.getPassword());
+            String reEnterPassword = new String(reEnterPasswordField.getPassword());
+            
+            if (isBlocked()) {
+                long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
+                long minutes = timeLeft / 60;
+                long seconds = timeLeft % 60;
+                JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s)", "Wait", JOptionPane.INFORMATION_MESSAGE); // Alert the user
+                return;                
+            }
+                            
+            // Ensure all fields are filled
+            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || reEnterPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Ensure new password and confirmation match
+            if (!newPassword.equals(reEnterPassword)) {
+                JOptionPane.showMessageDialog(frame, "Password do not match", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Validate that password length must be between 8 and 16 characters
+            if (newPassword.length() < 8 || newPassword.length() > 16) {
+                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            else if (!currentEmail.equals(currentSavedEmail) || !currentAnswer.equals(currentSavedSecurityQuestionAnswer)) {
+                JOptionPane.showMessageDialog(frame, "Invalid information entered, Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
+                
+                failedAttempts++; // Increase the failed attempt counter
+                
+                // Lock the account if the maximum number of failed attempts is reached
+                if(failedAttempts >= MAX_FAILED_ATTEMPTS) {
+                    blockTime = System.currentTimeMillis(); // Record the lock time
+                    
+                    BLOCK_DURATION *= 2;
+                    
+                    saveLockStatus(currentSavedUsername, blockTime);
+                    
+                    JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for " + BLOCK_DURATION / 60000 + " minute(s)", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            
+            // Loads existing user data from file
+            HashMap<String, String> userData = loadUserData();
+            
+            // Encrypt email user data from file
+            //String encryptedEmail = encryptData(email);
+            //String encryptedAnswer = encryptData(answer);
+            
+            // Create a unique key using encrypted email and security answer
+            String key = currentEmail + ":" + currentAnswer;
+            
+            // Check if the provided email and answer match any stored user data
+            if (userData.containsKey(key)) {
+                
+                // Encrypt new password before saving
+                String encryptedNewPassword = encryptData(newPassword);
+                String encryptedEmail = encryptData(currentEmail);
+                
+                // Save new password to file
+                saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
+                
+                // Show success message
+                JOptionPane.showMessageDialog(frame, "Password reset successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+                
+                frame.dispose();
+                new MainPage(userData); 
+            } else {
+                // Display error message if email or security answer is incorrect
+                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         cancelButton = new JButton("Cancel");
         cancelButton.setContentAreaFilled(false);
@@ -394,6 +480,45 @@ public class ResetPasswordFromProfilePage {
         frame.setVisible(true);       
     }
     
+    // Load lock status from a file
+    private void loadLockStatus() {
+        try (BufferedReader reader = new BufferedReader (new FileReader("lock_Reset_Password_status.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 3) {
+                    String lockedUser = parts[0];
+                    long lockedTime = Long.parseLong(parts[1]);
+                    int savedBlockDuration = Integer.parseInt(parts[2]);
+
+                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
+                        blockTime = lockedTime;
+                        failedAttempts = MAX_FAILED_ATTEMPTS;
+                        BLOCK_DURATION = savedBlockDuration;
+                    } else {
+                        failedAttempts = 0;
+                        blockTime = 0;
+                        BLOCK_DURATION = 60000;
+                        new File("lock_Reset_Password_status.txt").delete();
+                    }
+                }
+            }
+       } catch (IOException e) {
+        e.printStackTrace();
+        }
+    }
+    
+    private void saveLockStatus(String username, long blockTime) {
+        
+        // Opens the file "lock_Reset_Password_status.txt" for reading using a BufferedReader
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_Reset_Password_status.txt"))) {
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION);         
+        } catch (IOException e) {
+            // Catches and prints an error message if there is an issue creating the file
+            e.printStackTrace();
+        }
+    }
+    
     // Action listener for toggling the visibility of the password field
     public class PasswordVisible1 implements ActionListener {
         @Override
@@ -424,66 +549,76 @@ public class ResetPasswordFromProfilePage {
         }
     }
          
-    // Inner class to handle password reset actions
-    private class ResetPasswordAction implements ActionListener {
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Retrieve and trim input values from text fields
-            String currentEmail = emailTxt.getText().trim();
-            String currentAnswer = securityAnswerTxt.getText().trim();
-            String newPassword = new String(newPasswordField.getPassword());
-            String reEnterPassword = new String(reEnterPasswordField.getPassword());
-            
-            // Ensure all fields are filled
-            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || reEnterPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            
-            // Ensure new password and confirmation match
-            if (!newPassword.equals(reEnterPassword)) {
-                JOptionPane.showMessageDialog(frame, "Password do not match", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            // Validate that password length must be between 8 and 16 characters
-            if (newPassword.length() < 8 || newPassword.length() > 16) {
-                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            // Loads existing user data from file
-            HashMap<String, String> userData = loadUserData();
-            
-            // Encrypt email user data from file
-            //String encryptedEmail = encryptData(email);
-            //String encryptedAnswer = encryptData(answer);
-            
-            // Create a unique key using encrypted email and security answer
-            String key = currentEmail + ":" + currentAnswer;
-            
-            // Check if the provided email and answer match any stored user data
-            if (userData.containsKey(key)) {
-                
-                // Encrypt new password before saving
-                String encryptedNewPassword = encryptData(newPassword);
-                String encryptedEmail = encryptData(currentEmail);
-                
-                // Save new password to file
-                saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
-                
-                // Show success message
-                JOptionPane.showMessageDialog(frame, "Password reset successful", "Success", JOptionPane.INFORMATION_MESSAGE);
-                
-                frame.dispose();
-                new MainPage(userData); 
-            } else {
-                // Display error message if email or security answer is incorrect
-                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
+//    // Inner class to handle password reset actions
+//    private class ResetPasswordAction implements ActionListener {
+//        
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+////            // Retrieve and trim input values from text fields
+////            String currentEmail = emailTxt.getText().trim();
+////            String currentAnswer = securityAnswerTxt.getText().trim();
+////            String newPassword = new String(newPasswordField.getPassword());
+////            String reEnterPassword = new String(reEnterPasswordField.getPassword());
+////            
+////            if (isBlocked()) {
+////                long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
+////                long minutes = timeLeft / 60;
+////                long seconds = timeLeft % 60;
+////                JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s)", "Wait", JOptionPane.INFORMATION_MESSAGE); // Alert the user
+////                return;                
+////            }
+////                       
+////            // Ensure all fields are filled
+////            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || reEnterPassword.isEmpty()) {
+////                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
+////                return;
+////            }
+////            
+////            // Ensure new password and confirmation match
+////            if (!newPassword.equals(reEnterPassword)) {
+////                JOptionPane.showMessageDialog(frame, "Password do not match", "Error", JOptionPane.ERROR_MESSAGE);
+////                return;
+////            }
+////            
+////            // Validate that password length must be between 8 and 16 characters
+////            if (newPassword.length() < 8 || newPassword.length() > 16) {
+////                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.ERROR_MESSAGE);
+////                return;
+////            }
+////            
+////            else if (!currentEmail.equals(currentSavedEmail) || !currentAnswer.equals(currentSavedSecurityQuestionAnswer) )
+////            
+////            // Loads existing user data from file
+////            HashMap<String, String> userData = loadUserData();
+////            
+////            // Encrypt email user data from file
+////            //String encryptedEmail = encryptData(email);
+////            //String encryptedAnswer = encryptData(answer);
+////            
+////            // Create a unique key using encrypted email and security answer
+////            String key = currentEmail + ":" + currentAnswer;
+////            
+////            // Check if the provided email and answer match any stored user data
+////            if (userData.containsKey(key)) {
+////                
+////                // Encrypt new password before saving
+////                String encryptedNewPassword = encryptData(newPassword);
+////                String encryptedEmail = encryptData(currentEmail);
+////                
+////                // Save new password to file
+////                saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
+////                
+////                // Show success message
+////                JOptionPane.showMessageDialog(frame, "Password reset successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+////                
+////                frame.dispose();
+////                new MainPage(userData); 
+////            } else {
+////                // Display error message if email or security answer is incorrect
+////                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
+////            }
+//        }
+//    }
     
     // Method to lead user data from "user_data.txt" file
     private HashMap<String, String> loadUserData() {
@@ -566,6 +701,22 @@ public class ResetPasswordFromProfilePage {
         }
     }
     
+    // Method to check if the account is currently blocked due to too many failed login attempts
+    private boolean isBlocked() {
+        if (failedAttempts >= MAX_FAILED_ATTEMPTS) { // To check if the number of failed attempts has reached the maximum allowed
+            long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000;
+            if (timeLeft > 0) { // This determines if there's still time left in the lock duration, and if there is, then it returns true and the account stays locked
+                return true;
+            } else {                 // In the case that the time of lock duration has expired
+                failedAttempts = 0;  // The failed attempts and
+                blockTime = 0;       // blockTime is reset to 0, so now the user can try to login again  
+                new File("lock_Reset_Password_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility
+                return false;                         // This is so the isBlocked() method is not activated again when clicking the signUpButton
+            }
+        }
+        return false; // In case the failed attempts are below the max limit, the account is not blocked, and the user can keep trying to login
+    }
+        
     public static String encryptData(String data) {
         try {
             // Generate a random IV
