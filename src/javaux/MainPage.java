@@ -16,7 +16,6 @@ import java.awt.*; /* Importing all AWT classes for UI custumazation and event h
 //import java.awt.event.MouseEvent; // Represents a mouse event (ex. clicks, movment)
 import java.awt.event.*; /* Import all event handling classes */
 
-
 /* Importing collections */
 //import java.util.HashMap; // Implements a data structure for storing key-value pairs
 //import java.util.Map; // Defines an interface for a key-value pair collections
@@ -398,7 +397,6 @@ public class MainPage extends Buttons {
         }
     }
 
-
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
         
@@ -482,7 +480,7 @@ public class MainPage extends Buttons {
             User user = userData.get(username);
             
             //If statement to check the username input, and if is not found in the HashMap then it gives the following message
-            if (user == null) { //
+            if (user == null) { 
                 JOptionPane.showMessageDialog(frame, "Invalid username.", "Error", JOptionPane.ERROR_MESSAGE); //
             } else if (user != null && password.isEmpty()) { // If the username exists but the password field is empty do the following
                 JOptionPane.showMessageDialog(frame, "Please enter the password to proceed", "Enter Password", JOptionPane.INFORMATION_MESSAGE);

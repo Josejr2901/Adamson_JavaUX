@@ -275,8 +275,7 @@ public class securityQuestionDeleteProfile {
                 }
             }
         });
-        
-        
+                
         // Create a MouseAdapter object to handle mouse events for multiple buttons
         MouseAdapter listener = new MouseAdapter() {
             

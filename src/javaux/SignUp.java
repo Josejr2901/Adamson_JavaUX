@@ -506,7 +506,7 @@ public class SignUp {
             cancelButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
             cancelButton.setIcon(icon); // Sets the cancel button icon
             cancelButton.setBounds(410, 30, 30, 30);
-            cancelButton.addActionListener(e -> {
+            cancelButton.addActionListener(e -> { 
                 String usernameSignUp = usernameTxt.getText().trim(); // Get trimmed username input
                 String emailSignUp = emailTxt.getText().trim(); // Get trimmed email input
                 String passwordSignUp = new String(signUpPasswordField.getPassword()); // Get the password input
