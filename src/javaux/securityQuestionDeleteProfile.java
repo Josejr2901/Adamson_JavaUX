@@ -154,10 +154,8 @@ public class securityQuestionDeleteProfile {
         deleteAccountButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1)); // Add a white border 
         deleteAccountButton.setBackground(Color.decode("#876F4D")); // Set the background color (goldish brown)
         deleteAccountButton.setForeground(Color.WHITE); // Set text color to white
-        deleteAccountButton.setBounds(50, 340, 280, 30); // Set position and size
-         
-        // Add an action listener for the confirm button
-        deleteAccountButton.addActionListener(e -> {
+        deleteAccountButton.setBounds(50, 340, 280, 30); // Set position and size                 
+        deleteAccountButton.addActionListener(e -> { // Add an action listener for the confirm button
             
             String securityAnswer = securityAnswerTxt.getText().trim(); // Retrieve the user-inputted answer and remove spaces
             String email = emailTxt.getText().trim();
@@ -387,7 +385,7 @@ public class securityQuestionDeleteProfile {
     
     // Method to delete a user's data based on their encrypted email and username
     private void deleteUserData(String currentEmail,  String username) {
-        try{
+        try {
             File file = new File("user_data.txt"); // References the original user data file
             File tempFile = new File("user_data_temp.txt"); // Creates a temporary file to store the updated data without the deleted user
             
