@@ -78,7 +78,7 @@ public class MainPage extends Buttons {
     private int failedAttempts = 0; //To keep track of how many times the user has attempted to log in with an incorrect password.
     private long blockTime = 0; //Stores the time stamp of when the account was blocked after reaching the maximum number of failed attempts. used in conjuction with BLOCK_DURATION to determine if the user is currently locked out
     private final int MAX_FAILED_ATTEMPTS = 3; //A constant that defines the maximum number of allowed failed login attempts before the account is locked
-    private int BLOCK_DURATION = 30000; //Defining the lock duration in milliseconds *1 minute* [60 seconds * 1000 milliseconds = 1 minute]
+    private long BLOCK_DURATION = 30000; //Defining the lock duration in milliseconds *1 minute* [60 seconds * 1000 milliseconds = 1 minute]
 
     private Map<String, User> userData = new HashMap<>(); //Used to store user credentials
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
@@ -277,7 +277,7 @@ public class MainPage extends Buttons {
         dontHaveAccLabel = new JLabel("Don't have an account?");
         dontHaveAccLabel.setForeground(Color.decode("#8A6E4B"));
         dontHaveAccLabel.setBounds(50, 370, 200, 20);
-
+         
         signUpButton = new JButton("Sign Up");
         signUpButton.setContentAreaFilled(false); // Disable default background behavior
         signUpButton.setOpaque(true);  // Make sure the background is opaque to see the color
@@ -365,37 +365,30 @@ public class MainPage extends Buttons {
         frame.add(loginButton);
         frame.add(signUpButton);
         frame.setVisible(true);
-    }
+    } 
+     
     
-    // Load lock status from a file
     private void loadLockStatus() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("lock_status.txt"))) {
-            String line = reader.readLine();
-            if (line != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 3) { // Now we expect username, locked time, and block duration
-                    String lockedUser = parts[0];
-                    long lockedTime = Long.parseLong(parts[1]);
-                    int savedBlockDuration = Integer.parseInt(parts[2]); // Read saved block duration
-
-                    // If lock duration is still active, apply it
-                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
-                        blockTime = lockedTime; // Restore block time
-                        failedAttempts = MAX_FAILED_ATTEMPTS; // Set to max to enforce lock
-                        BLOCK_DURATION = savedBlockDuration; // Restore saved block duration
-                    } else {
-                        // Lock expired, reset lock status
-                        failedAttempts = 0;
-                        blockTime = 0;
-                        BLOCK_DURATION = 60000; // Reset to default duration
-                        new File("lock_status.txt").delete(); // Clear lock file
+        File lockFile = new File("lock_status.txt");
+        if (lockFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(lockFile))) {
+                String line = reader.readLine();
+                if (line != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length == 4) { 
+                        String usernameFromFile = parts[0];
+                        blockTime = Long.parseLong(parts[1]);
+                        BLOCK_DURATION = Long.parseLong(parts[2]);
+                        failedAttempts = Integer.parseInt(parts[3]);  
                     }
                 }
+            } catch (IOException | NumberFormatException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
+
+
 
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
@@ -480,7 +473,7 @@ public class MainPage extends Buttons {
             User user = userData.get(username);
             
             //If statement to check the username input, and if is not found in the HashMap then it gives the following message
-            if (user == null) { 
+            if (user == null) {
                 JOptionPane.showMessageDialog(frame, "Invalid username.", "Error", JOptionPane.ERROR_MESSAGE); //
             } else if (user != null && password.isEmpty()) { // If the username exists but the password field is empty do the following
                 JOptionPane.showMessageDialog(frame, "Please enter the password to proceed", "Enter Password", JOptionPane.INFORMATION_MESSAGE);
@@ -503,7 +496,16 @@ public class MainPage extends Buttons {
                 }
             }
                 else { // This statement is in case both the username and password entered by the user are correct and do exist in the HashMap
-                    failedAttempts = 0; // Reset count of failed Attempts to 0 when the login is successful 
+                    //failedAttempts = 0; // Reset count of failed Attempts to 0 when the login is successful 
+                    
+                        failedAttempts = 0;
+                        blockTime = 0;
+                        BLOCK_DURATION = 60000; // Optional: reset block duration on successful login
+ 
+                        File lockFile = new File("lock_status.txt");
+                        if (lockFile.exists()) {
+                            lockFile.delete();
+                        }
                     
                     // Statement to check if the checkbox is currently selected
                     if (checkBox.isSelected()) {
@@ -527,7 +529,7 @@ public class MainPage extends Buttons {
         // Function to save the lock status of an account. This is to preserve the lockout information even after the program is closed
         private void saveLockStatus(String username, long blockTime) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_status.txt"))) {
-                writer.write(username + "," + blockTime + "," + BLOCK_DURATION); // Save username, lock time, and block duration
+                writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts); // Save username, lock time, and block duration
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -543,13 +545,13 @@ public class MainPage extends Buttons {
             } else {                    // In the case that the time of lock duration has expired
                 failedAttempts = 0;     // The failed attempts and ...
                 blockTime = 0;          // blockTime is reset to 0, so now the user can try to login again
-                new File("lock_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility
+                //new File("lock_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility
                 return false;                       // This is so the isBlocked() method is not activated again when clicking the signUpButton 
             }
         }
         return false; // In case the failed attempts are below the max limit, the account is not blocked, and the user can keep trying to login
     }
-    
+     
     // Method used to load session data from a file, this is used to remember the user info when the checkBox had been selected and succesfully logged in
     private User loadSessionData() {
         try {
@@ -577,7 +579,7 @@ public class MainPage extends Buttons {
     /* AES Encryption method and Decryption Methods */
     
     public static String encryptData(String data) {
-        try{
+        try {
             // Generate a random IV
             byte[] iv = new byte[16];
             new SecureRandom().nextBytes(iv);
@@ -599,7 +601,7 @@ public class MainPage extends Buttons {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }    
+        }
     }
     
     // Decrypt method with IV
