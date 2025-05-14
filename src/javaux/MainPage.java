@@ -365,7 +365,7 @@ public class MainPage extends Buttons {
         frame.add(loginButton);
         frame.add(signUpButton);
         frame.setVisible(true);
-    } 
+    }
      
     
     private void loadLockStatus() {
@@ -375,7 +375,7 @@ public class MainPage extends Buttons {
                 String line = reader.readLine();
                 if (line != null) {
                     String[] parts = line.split(",");
-                    if (parts.length == 4) { 
+                    if (parts.length == 4) {
                         String usernameFromFile = parts[0];
                         blockTime = Long.parseLong(parts[1]);
                         BLOCK_DURATION = Long.parseLong(parts[2]);

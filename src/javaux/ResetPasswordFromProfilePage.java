@@ -306,13 +306,19 @@ public class ResetPasswordFromProfilePage {
             }
             
             else {
-                 // Loads existing user data from file
+                
+                failedAttempts = 0;
+                blockTime = 0;
+                BLOCK_DURATION = 60000;
+                
+                File lockFile = new File("lock_reset_password_status.txt");
+                if (lockFile.exists()) {
+                    lockFile.delete(); 
+                }                  
+                                
+                // Loads existing user data from file
                 HashMap<String, String> userData = loadUserData();
-
-                // Encrypt email user data from file
-                //String encryptedEmail = encryptData(email);
-                //String encryptedAnswer = encryptData(answer);
-
+ 
                 // Create a unique key using encrypted email and security answer
                 String key = currentEmail + ":" + currentAnswer;
 
@@ -331,14 +337,8 @@ public class ResetPasswordFromProfilePage {
 
                     frame.dispose();
                     new MainPage(userData); 
-                } 
-
-    //            else {
-    //                // Display error message if email or security answer is incorrect
-    //                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
-    //            }
-                }
-            
+                }  
+            }            
            
         });
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,7 +489,7 @@ public class ResetPasswordFromProfilePage {
     
     // Load lock status from a file
     private void loadLockStatus() {
-        try (BufferedReader reader = new BufferedReader (new FileReader("lock_Reset_Password_status.txt"))) {
+        try (BufferedReader reader = new BufferedReader (new FileReader("lock_reset_password_status.txt"))) {
             String line = reader.readLine();
             if (line != null) {
                 String[] parts = line.split(",");
@@ -506,7 +506,7 @@ public class ResetPasswordFromProfilePage {
                         failedAttempts = 0;
                         blockTime = 0;
                         BLOCK_DURATION = 60000;
-                        new File("lock_Reset_Password_status.txt").delete();
+                        new File("lock_reset_password_status.txt").delete();
                     }
                 }
             }
@@ -517,8 +517,8 @@ public class ResetPasswordFromProfilePage {
     
     private void saveLockStatus(String username, long blockTime) {
         
-        // Opens the file "lock_Reset_Password_status.txt" for reading using a BufferedReader
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_Reset_Password_status.txt"))) {
+        // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status.txt"))) {
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION);         
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue creating the file
@@ -646,7 +646,7 @@ public class ResetPasswordFromProfilePage {
             } else {                 // In the case that the time of lock duration has expired
                 failedAttempts = 0;  // The failed attempts and
                 blockTime = 0;       // blockTime is reset to 0, so now the user can try to login again  
-                new File("lock_Reset_Password_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility
+                //new File("lock_reset_password_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility
                 return false;                         // This is so the isBlocked() method is not activated again when clicking the signUpButton
             }
         }

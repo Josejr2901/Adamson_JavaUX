@@ -115,8 +115,16 @@ public class SecurityQuestionLogInPage {
                 }
             }
                 else { // This statement is in case both the username and password entered by the user are correct and do exist in the HashMap
-                    failedAttempts = 0; // Reset count of failed Attempts to 0 when the login is successful                   
-                  
+                    
+                    failedAttempts = 0;
+                    blockTime = 0;
+                    BLOCK_DURATION = 60000;
+                    
+                    File lockFile = new File("security_Question_lock_status.txt");
+                    if (lockFile.exists()) {
+                        lockFile.delete();
+                    }
+                              
                     // After checking if the checkbox was selected, open a new frame and close the current frame.
                     frame.dispose();
                     new LoggedInPage(user);
@@ -224,7 +232,7 @@ public class SecurityQuestionLogInPage {
             } else {                // In the case that the time of lock duration has expired
                 failedAttempts = 0; // Reset failed attempts to 0 after lock expires
                 blockTime = 0;      // Reset blockTime to 0, so the user can try to login again
-                new File("security_Question_lock_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility 
+//                new File("security_Question_lock_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility 
                 return false;                         // This is so the isBlocked() method is not activated again when clicking the singnUpButton
             }
         }

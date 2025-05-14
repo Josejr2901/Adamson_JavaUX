@@ -189,8 +189,16 @@ public class securityQuestionDeleteProfile {
                     JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for " + BLOCK_DURATION / 60000 + " minute(s)", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } else { // If the answer is correct
+                
                 failedAttempts = 0; // Reset the failed attempts counter
-
+                blockTime = 0;
+                BLOCK_DURATION = 60000;
+                               
+                File lockFile = new File("delete_user_locked_status.txt");
+                if (lockFile.exists()) {
+                    lockFile.delete();
+                }
+                
                 // Load user data from the database or file
                 HashMap<String, String> userData = loadUserData(); 
 
@@ -353,7 +361,7 @@ public class securityQuestionDeleteProfile {
             } else {                // In the case that the time of lock duration has expired
                 failedAttempts = 0; // Reset failed attempts to 0 after lock expired
                 blockTime = 0;      // Reset blockTime to 0, so the user can try to login again
-                new File("delete_user_lock_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility 
+                //new File("delete_user_lock_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility 
                 return false;                               // This is so the isBlocked method is not activated again when clicking the signUpButton
             }
         }
