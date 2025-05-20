@@ -349,7 +349,7 @@ public class securityQuestionDeleteProfile {
         frame.add(passwordVisibleCheckBox);
         frame.add(deleteAccountButton);
         frame.add(cancelButton);
-        frame.setVisible(true);        
+        frame.setVisible(true);
     }
     
     // Method to check if the account is currently blocked due to too many failed login attempts
@@ -400,7 +400,7 @@ public class securityQuestionDeleteProfile {
             if (!tempFile.exists()) {
                 tempFile.createNewFile(); // Creates a new file if it does not exist
             }
-                                    
+            
             // Opens the original file for reading and the temp file for writing
             BufferedReader reader = new BufferedReader(new FileReader(file));
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
@@ -417,7 +417,7 @@ public class securityQuestionDeleteProfile {
                     // Extracts and trims the stored email and username
                     String storedEmail = decryptData(parts[1]); 
                     String storedUsername = decryptData(parts[0]);
-
+                    
                     // If the email and username match the provided encrypted credentials, mark as found and skip writing this line 
                     if (storedEmail.equals(currentEmail) && storedUsername.equals(username)) {
                         foundUser = true;
@@ -550,7 +550,7 @@ public class securityQuestionDeleteProfile {
                         // If the lock duration has expired, reset the lock staus
                         failedAttempts = 0; // Resets the failed attempts counter
                         blockTime = 0; // Clears the block timestamp
-                        BLOCK_DURATION = 60000;
+                        BLOCK_DURATION = 60000; // Sets the block duration to it's default value
                         new File("delete_user_lock_status.txt").delete(); // Deletes the lock status file
                     }
                 }
@@ -574,3 +574,60 @@ public class securityQuestionDeleteProfile {
     }
     
 }
+
+
+/*
+
+// Retrieve and trim input values from text fields
+            String currentEmail = emailTxt.getText().trim();
+            String currentAnswer = securityAnswerTxt.getText().trim();
+            String newPassword = new String(newPasswordField.getPassword());
+            String confirmNewPassword = new String(confirmNewPasswordField.getPassword());
+            
+            // Ensure all fiels are filled
+            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Ensure new password and confirmation match
+            if (!newPassword.equals(confirmNewPassword)) {
+                JOptionPane.showMessageDialog(frame, "Passwords do not match");
+            }
+            
+            // Validate that password length must be between 8 and 16 characters
+            if (newPassword.length() < 8 || newPassword.length() > 16) {
+                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Load existing user data from file
+            HashMap<String, String> userData = loadUserData();
+            
+            // Encrypt email and security answer for validation
+//            String encryptedEmail = encryptData(email);
+//            String encryptAnswer = encryptData(answer);
+            
+            // Create a unique key using encrypted email and security answer
+            String key = currentEmail + ":" + currentAnswer;
+            
+            // Check if the provided email and answer match any stored user data
+            if (userData.containsKey(key)) {
+                // Encrypt new password before saving
+                String encryptedNewPassword = encryptData(newPassword);
+                String encryptedEmail = encryptData(currentEmail);
+                //String currentAnswer = answer;
+                
+                // Save new password to file
+                saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
+                
+                // Show success message
+                JOptionPane.showMessageDialog(frame, "Password reset succesful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
+                new MainPage(userData);
+            } else {
+                // Display error message if email or security answer is incorrect
+                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+*/

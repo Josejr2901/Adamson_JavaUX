@@ -31,7 +31,7 @@ import javax.swing.event.DocumentListener; // Listens for document changes and r
 import javax.crypto.spec.*;
 import java.security.SecureRandom;
 
-public class ChangePasswordPage {
+public class ChangeForgotPasswordPage {
     
     private JFrame frame;
     private JLabel usernameLabel, emailLabel, resetPasswordLabel, newPasswordLabel, confirmNewPasswordLabel, securityQuestionLabel, questionLabel, answerLabel, emailIcon, answerIcon;
@@ -39,6 +39,10 @@ public class ChangePasswordPage {
     private JCheckBox passwordVisibleCB1, passwordVisibleCB2;
     private JPasswordField newPasswordField, confirmNewPasswordField;
     private JButton resetPasswordButton, cancelButton;
+    private int failedAttempts = 0;
+    private long blockTime = 0;
+    private final int MAX_FAILED_ATTEMPTS = 3;
+    private int BLOCK_DURATION = 30000;
     
     // AE key for encryption and decryption 
     private static final String SECRET_KEY = "mysecretkey12345"; // 16-byte key (128 bits)
@@ -46,8 +50,16 @@ public class ChangePasswordPage {
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     
     // Constructor to initialize the change password window
-    ChangePasswordPage(String username, String email, String securityQuestion, String answer) {
+    ChangeForgotPasswordPage(String username, String email, String securityQuestion, String answer) {
                
+        loadLockStatus();
+        
+        /* Retrieve user detail from user objkect */
+        String currentSavedUsername = username;
+        String currentSavedEmail = email;
+        String currentSavedSecurityQuestion = securityQuestion;
+        String currentSavedSecurityQuestionAnswer = answer;
+        
         frame = new JFrame("Change Password - ADAMSON AI");
         frame.setSize(420, 440);
         frame.setResizable(false);
@@ -130,7 +142,6 @@ public class ChangePasswordPage {
                 }
                 return null; // Return null if the input format is valid
             }
-         
        });
                 
         answerIcon = new JLabel();
@@ -234,7 +245,90 @@ public class ChangePasswordPage {
         resetPasswordButton.setBackground(Color.decode("#876F4D"));
         resetPasswordButton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
         resetPasswordButton.setForeground(Color.WHITE);
-        resetPasswordButton.addActionListener(new ResetPasswordAction());
+        resetPasswordButton.addActionListener(e -> {
+            
+            // Retrieve and trim input values from text fields
+            String currentEmail = emailTxt.getText().trim();
+            String currentAnswer = securityAnswerTxt.getText().trim();
+            String newPassword = new String(newPasswordField.getPassword());
+            String reEnterPassword = new String(confirmNewPasswordField.getPassword());
+            
+            // Check if the account is locked due to multiple failed attemprs
+            if (isBlocked()) {
+                long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000; // Calculate remaining lock time
+                long minutes = timeLeft / 60; // Calculate minutes, this extract  minutes from the total seconds
+                long seconds = timeLeft % 60; // Calculate remaining seconds, this extract remaining seconds after minutes
+                JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s)", "Wait", JOptionPane.INFORMATION_MESSAGE); // Alert the user 
+                return; // Stop further execution
+            }
+            
+            // Ensure all fields are filled
+            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || reEnterPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            
+            // Ensure new password and confirmation match
+            if (!newPassword.equals(reEnterPassword)) {
+                JOptionPane.showMessageDialog(frame, "Password do not match", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            if  (newPassword.length() < 8 || newPassword.length() > 16) {
+                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+            // Validate that password length must be between 8 and 16 characters
+            else if (!currentEmail.equals(currentSavedEmail) || !currentAnswer.equals(currentSavedSecurityQuestionAnswer)) {
+                JOptionPane.showMessageDialog(frame, "Invalid information entered. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
+                
+                failedAttempts++; // Increase the failed attempt counter
+                
+                // Lock the account if the maximum number of failed attempts is reached
+                if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+                    blockTime = System.currentTimeMillis(); // Record the lock time
+                    
+                    BLOCK_DURATION *= 2;
+                    
+                    saveLockStatus(currentSavedUsername, blockTime); // Save the lock status to prevent further attempts
+                    
+                    JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for " + BLOCK_DURATION / 60000 + " minute(s)", "Error", JOptionPane.ERROR_MESSAGE);                    
+                }
+            }
+                        
+            else {
+                failedAttempts = 0;
+                blockTime = 0;
+                BLOCK_DURATION = 60000;
+                
+                File lockFile = new File("lock_forgot_password_reset_status.txt");
+                if (lockFile.exists()) {
+                    lockFile.delete();
+                }
+                
+                // Loads existing user data from file
+                HashMap<String, String> userData = loadUserData();
+                
+                // Create a unique key using encreypted email and security answer
+                String key = currentEmail + ":" + currentAnswer;
+                
+                // Check if the provided email and answer match any stored user data
+                if (userData.containsKey(key) && newPassword.equals(reEnterPassword)) {
+                    
+                    // Encrypt new password before saving
+                    String encryptedNewPassword = encryptData(newPassword);
+                    String encryptedEmail = encryptData(currentEmail);
+                    
+                    // Save new password to file
+                    saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
+                    
+                    // Show success message
+                    JOptionPane.showMessageDialog(frame, "Password reset successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    frame.dispose();
+                    new MainPage(userData);
+                }
+            }
+        });
         
         cancelButton = new JButton("Cancel");
         cancelButton.setContentAreaFilled(false);
@@ -323,7 +417,7 @@ public class ChangePasswordPage {
         
             // Method triggered when the mouse is clicked on a button
             @Override
-            public void mouseClicked(MouseEvent e) { 
+            public void mouseClicked(MouseEvent e) {
                 JButton source = (JButton) e.getSource(); // Gets the button that was clicked
                 source.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Changes the cursor icn to a hand
                 source.setBackground(Color.WHITE); // Sets the background color of the button to white
@@ -385,6 +479,52 @@ public class ChangePasswordPage {
         frame.setVisible(true);
     }
     
+    // Method to load the lock status from a file 
+    private void loadLockStatus() {
+        
+        // Opens the file "lock_forgot_password_reset_status.txt" for reading using a BufferedReader
+        try (BufferedReader reader = new BufferedReader (new FileReader("lock_forgot_password_reset_status.txt"))) {
+            
+            String line = reader.readLine(); // Reads the first line of the file
+            
+            if (line != null) { // Check if the file contains data
+                String[] parts = line.split(","); // Splits the line into an array using a comma as a delimeter
+                
+                if (parts.length == 3) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                    String lockedUser = parts[0]; // Extracts the username that was locked
+                    long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
+                    int savedBlockDuration = Integer.parseInt(parts[2]);
+                    
+                    // Check if the lock duration has not yet expired
+                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
+                        blockTime = lockedTime; // Updates the blockTime with the stored lock timestamp
+                        failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to the maximum limit
+                        BLOCK_DURATION = savedBlockDuration;
+                    } else {
+                        // If the lock duration has expired, reset the lock status
+                        failedAttempts = 0;  // Resets the failed attempts counter
+                        blockTime = 0; // clearks the block timestamp
+                        BLOCK_DURATION = 60000; // Sets the block duration to it's default value
+                        new File("lock_forgot_password_reset_status.txt").delete(); // Deletes the lock status file
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // Catches and prints an error message if there is an issue regarding the file
+            e.printStackTrace();
+        }
+    }
+    
+    private void saveLockStatus(String username, long blockTime) {
+        // Opens the file "lock_forgot_password_reset_status.txt"
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_forgot_password_reset_status.txt"))) {
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION);
+        } catch (IOException e) {
+            //Catches and prints an error message if there is an issue creating the file
+            e.printStackTrace();
+        }
+    }
+    
     // Action listener for toggling the visibility of the password field
     public class PasswordVisible1 implements ActionListener {
         @Override
@@ -414,86 +554,30 @@ public class ChangePasswordPage {
             }
         }
     }
-    
-    // Inner class to handle password reset actions
-    private class ResetPasswordAction implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Retrieve and trim input values from text fields
-            String currentEmail = emailTxt.getText().trim();
-            String currentAnswer = securityAnswerTxt.getText().trim();
-            String newPassword = new String(newPasswordField.getPassword());
-            String confirmNewPassword = new String(confirmNewPasswordField.getPassword());
-            
-            // Ensure all fiels are filled
-            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            
-            // Ensure new password and confirmation match
-            if (!newPassword.equals(confirmNewPassword)) {
-                JOptionPane.showMessageDialog(frame, "Passwords do not match");
-            }
-            
-            // Validate that password length must be between 8 and 16 characters
-            if (newPassword.length() < 8 || newPassword.length() > 16) {
-                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            // Load existing user data from file
-            HashMap<String, String> userData = loadUserData();
-            
-            // Encrypt email and security answer for validation
-//            String encryptedEmail = encryptData(email);
-//            String encryptAnswer = encryptData(answer);
-            
-            // Create a unique key using encrypted email and security answer
-            String key = currentEmail + ":" + currentAnswer;
-            
-            // Check if the provided email and answer match any stored user data
-            if (userData.containsKey(key)) {
-                // Encrypt new password before saving
-                String encryptedNewPassword = encryptData(newPassword);
-                String encryptedEmail = encryptData(currentEmail);
-                //String currentAnswer = answer;
-                
-                // Save new password to file
-                saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
-                
-                // Show success message
-                JOptionPane.showMessageDialog(frame, "Password reset succesful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.dispose();
-                new MainPage(userData);
-            } else {
-                // Display error message if email or security answer is incorrect
-                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-     
-    
+         
       private HashMap<String, String> loadUserData() {
             HashMap<String, String> userData = new HashMap<>();
             
+            // Open the file for reading
             try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) {
                 String line;
                 
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(",");
+                while ((line = reader.readLine()) != null) { // Read each line of the file
+                    String[] parts = line.split(","); // Split line by commas to extract user details
                     
+                    // Ensure the line has enough data fields (at least 3)
                     if (parts.length >= 3) {
-                        String decryptedEmail = decryptData(parts[1]);
-                        String decryptedAnswer = decryptData(parts[4]);
+                        String decryptedEmail = decryptData(parts[1]); // Encrypt email
+                        String decryptedAnswer = decryptData(parts[4]); // Split line by commas to extract user details
                         
+                        // Store the encrypted email + answer as a key and password as a value
                         userData.put(decryptedEmail + ":" + decryptedAnswer, line);  
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return userData;
+            return userData; // Return the user data map
         }
     
     // Method to update and save a new password in the "user_data.txt" file
@@ -551,6 +635,22 @@ public class ChangePasswordPage {
             e.printStackTrace();
         }
     } 
+    
+    
+    // Method to check if the account is currently blocked due to too many failed login attempts
+    private boolean isBlocked() {
+        if (failedAttempts >= MAX_FAILED_ATTEMPTS) { // To check if the number of failed attempts has reached the maximum allowed
+            long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000;
+            if (timeLeft > 0) {       // This determines if there's still time left in the lock duration, and if there is, then it returns true and the account stays locked
+                return true;    
+            } else {                  // In the case that the time of lock duration has expired
+                failedAttempts = 0;   // The failed attempts and
+                blockTime = 0;        // blockTime is resrt to 0, so now the user can try to login again
+                return false;         // This is so the isBlocked() method is not activated again when clicking the signUpButton
+            }
+        }
+        return false;                 // In case the failed attempts are below the max limit, the account is not blocked, and the user can keep trying to login
+    }
     
      /* Encryption and decryption methods */
 

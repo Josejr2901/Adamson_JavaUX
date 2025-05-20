@@ -195,7 +195,7 @@ public class ForgotPasswordPage {
 
     // Method to open the security question page
     private void openEmailFrame(String username, String email, String securityQuestion, String answer) {
-        new ChangePasswordPage(username, email, securityQuestion, answer); // Open the password chage page
+        new ChangeForgotPasswordPage(username, email, securityQuestion, answer); // Open the password chage page
         frame.dispose(); // Close current frame
     }
      

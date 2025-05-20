@@ -64,7 +64,7 @@ public class ResetPasswordFromProfilePage {
         
         loadLockStatus();
         
-        /* Retrieve user detair from user object */
+        /* Retrieve user detail from user object */
         String currentSavedUsername = user.getUsername(); // Retrieve the username from the user object
         String currentSavedEmail = user.getEmail(); // Retrieve the email from the user object
         String currentSavedSecurityQuestion = user.getQuestion(); // Retrieve the security question from the object
@@ -314,7 +314,7 @@ public class ResetPasswordFromProfilePage {
                 File lockFile = new File("lock_reset_password_status.txt");
                 if (lockFile.exists()) {
                     lockFile.delete(); 
-                }                  
+                }
                                 
                 // Loads existing user data from file
                 HashMap<String, String> userData = loadUserData();
@@ -337,9 +337,8 @@ public class ResetPasswordFromProfilePage {
 
                     frame.dispose();
                     new MainPage(userData); 
-                }  
-            }            
-           
+                }
+            }
         });
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         cancelButton = new JButton("Cancel");
@@ -487,30 +486,38 @@ public class ResetPasswordFromProfilePage {
         frame.setVisible(true);       
     }
     
-    // Load lock status from a file
+    // Method to load the lock status from a file
     private void loadLockStatus() {
+        
+        // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader (new FileReader("lock_reset_password_status.txt"))) {
-            String line = reader.readLine();
-            if (line != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 3) {
-                    String lockedUser = parts[0];
-                    long lockedTime = Long.parseLong(parts[1]);
+                      
+            String line = reader.readLine(); // Reads the first line of the file
+                       
+            if (line != null) { // Check if the file contains data
+                String[] parts = line.split(","); // Splits the line into an array using a coma as a delimeter
+                
+                if (parts.length == 3) {  // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                    String lockedUser = parts[0]; // Extracts the username that was locked
+                    long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);
 
+                    // Check if the lock duration has not yet expired
                     if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
-                        blockTime = lockedTime;
-                        failedAttempts = MAX_FAILED_ATTEMPTS;
+                        blockTime = lockedTime;  // Updates the blockTime with the stored lock timestamp
+                        failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to maximum limit
                         BLOCK_DURATION = savedBlockDuration;
                     } else {
-                        failedAttempts = 0;
-                        blockTime = 0;
-                        BLOCK_DURATION = 60000;
-                        new File("lock_reset_password_status.txt").delete();
+                        // If the lock duration has expired, reset the lock status
+                        failedAttempts = 0; // Resets the failed attempts counter
+                        blockTime = 0; // Clearks the block timestamp
+                        BLOCK_DURATION = 60000; // Sets the block duration to it's default value
+                        new File("lock_reset_password_status.txt").delete(); // Deletes the lock status file 
                     }
                 }
             }
        } catch (IOException e) {
+           // Catches and prints an error message if there is an issue regarding the file
         e.printStackTrace();
         }
     }
@@ -583,7 +590,7 @@ public class ResetPasswordFromProfilePage {
     }
      
     
-        // Method to update and save a new password in the "user_data.txt" file
+    // Method to update and save a new password in the "user_data.txt" file
     private void saveNewPasswordToFile(String encryptedEmail, String encryptedNewPassword) {
         try {
             // Open the original user data file
@@ -641,16 +648,16 @@ public class ResetPasswordFromProfilePage {
     private boolean isBlocked() {
         if (failedAttempts >= MAX_FAILED_ATTEMPTS) { // To check if the number of failed attempts has reached the maximum allowed
             long timeLeft = (blockTime + BLOCK_DURATION - System.currentTimeMillis()) / 1000;
-            if (timeLeft > 0) { // This determines if there's still time left in the lock duration, and if there is, then it returns true and the account stays locked
+            if (timeLeft > 0) {      // This determines if there's still time left in the lock duration, and if there is, then it returns true and the account stays locked
                 return true;
             } else {                 // In the case that the time of lock duration has expired
                 failedAttempts = 0;  // The failed attempts and
                 blockTime = 0;       // blockTime is reset to 0, so now the user can try to login again  
                 //new File("lock_reset_password_status.txt").delete(); // Furthermore, the txt file that contained the lock status is deleted to unlock the login possibility
-                return false;                         // This is so the isBlocked() method is not activated again when clicking the signUpButton
+                return false;        // This is so the isBlocked() method is not activated again when clicking the signUpButton
             }
         }
-        return false; // In case the failed attempts are below the max limit, the account is not blocked, and the user can keep trying to login
+        return false;                // In case the failed attempts are below the max limit, the account is not blocked, and the user can keep trying to login
     }
         
     public static String encryptData(String data) {

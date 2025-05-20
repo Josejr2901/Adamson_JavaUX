@@ -366,7 +366,7 @@ public class MainPage extends Buttons {
         frame.add(signUpButton);
         frame.setVisible(true);
     }
-     
+    
     
     private void loadLockStatus() {
         File lockFile = new File("lock_status.txt");
@@ -387,8 +387,6 @@ public class MainPage extends Buttons {
             }
         }
     }
-
-
 
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
@@ -496,9 +494,8 @@ public class MainPage extends Buttons {
                 }
             }
                 else { // This statement is in case both the username and password entered by the user are correct and do exist in the HashMap
-                    //failedAttempts = 0; // Reset count of failed Attempts to 0 when the login is successful 
                     
-                        failedAttempts = 0;
+                        failedAttempts = 0; // Reset count of failed Attempts to - when the login is successful 
                         blockTime = 0;
                         BLOCK_DURATION = 60000; // Optional: reset block duration on successful login
  

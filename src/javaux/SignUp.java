@@ -58,7 +58,7 @@ public class SignUp {
     private JPasswordField signUpPasswordField, confirmPasswordField;
     private JCheckBox passwordVisibleCB1, passwordVisibleCB2;
     private ImageIcon visible, notVisible, icon;
-    private JRadioButton maleButton, femaleButton;
+    private JRadioButton maleButton, femaleButton; 
     private JComboBox<Integer> yearDropdown, dayDropdown;
     private JComboBox<String> monthDropdown, securityQuestionDropdown;
     private MainPage mainPage; // Reference to MainPage

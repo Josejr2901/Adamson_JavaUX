@@ -30,7 +30,7 @@ public class ProfilePage {
     private JFrame frame; // Main window (frame) for the profile page
     private JLabel usernameLabel, emailLabel, genderLabel; // Labels to display information
     private JButton editProfileButton, cancelButton, logoutButton, profilePictureButton; // Buttons for various actions
-
+     
     // Constructor for the ProfilePage class, initializing the profile UI for the given user
     public ProfilePage(User user) {
         
