@@ -367,8 +367,9 @@ public class MainPage extends Buttons {
         frame.setVisible(true);
     }
     
-    
+    // Method to load the account lock status from a file
     private void loadLockStatus() {
+        
         File lockFile = new File("lock_status.txt");
         if (lockFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(lockFile))) {

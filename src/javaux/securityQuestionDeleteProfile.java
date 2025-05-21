@@ -218,8 +218,8 @@ public class securityQuestionDeleteProfile {
                         Files.deleteIfExists(Paths.get("delete_user_lock_status.txt"));
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
-                        } 
-                    }                  
+                        }
+                    }
                                         
                     else if (response == JOptionPane.YES_OPTION) { // If the user confirms account deletion
                         deleteUserData(currentEmail, username); // Delete usr data
@@ -584,60 +584,3 @@ public class securityQuestionDeleteProfile {
     }
     
 }
-
-
-/*
-
-// Retrieve and trim input values from text fields
-            String currentEmail = emailTxt.getText().trim();
-            String currentAnswer = securityAnswerTxt.getText().trim();
-            String newPassword = new String(newPasswordField.getPassword());
-            String confirmNewPassword = new String(confirmNewPasswordField.getPassword());
-            
-            // Ensure all fiels are filled
-            if (currentEmail.isEmpty() || currentAnswer.isEmpty() || newPassword.isEmpty() || confirmNewPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Please fill in all fields", "Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            
-            // Ensure new password and confirmation match
-            if (!newPassword.equals(confirmNewPassword)) {
-                JOptionPane.showMessageDialog(frame, "Passwords do not match");
-            }
-            
-            // Validate that password length must be between 8 and 16 characters
-            if (newPassword.length() < 8 || newPassword.length() > 16) {
-                JOptionPane.showMessageDialog(frame, "Password must be between 8 and 16 characters", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            // Load existing user data from file
-            HashMap<String, String> userData = loadUserData();
-            
-            // Encrypt email and security answer for validation
-//            String encryptedEmail = encryptData(email);
-//            String encryptAnswer = encryptData(answer);
-            
-            // Create a unique key using encrypted email and security answer
-            String key = currentEmail + ":" + currentAnswer;
-            
-            // Check if the provided email and answer match any stored user data
-            if (userData.containsKey(key)) {
-                // Encrypt new password before saving
-                String encryptedNewPassword = encryptData(newPassword);
-                String encryptedEmail = encryptData(currentEmail);
-                //String currentAnswer = answer;
-                
-                // Save new password to file
-                saveNewPasswordToFile(encryptedEmail, encryptedNewPassword);
-                
-                // Show success message
-                JOptionPane.showMessageDialog(frame, "Password reset succesful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                frame.dispose();
-                new MainPage(userData);
-            } else {
-                // Display error message if email or security answer is incorrect
-                JOptionPane.showMessageDialog(frame, "Email or security answer is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-
-*/
