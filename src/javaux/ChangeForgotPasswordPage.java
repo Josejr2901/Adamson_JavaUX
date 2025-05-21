@@ -196,8 +196,7 @@ public class ChangeForgotPasswordPage {
                     return "Wrong email";
                 }
                 return null; // No issues found with the email
-            }
-            
+            }            
         });
                 
         // Label to display validation icons for the email fields 
@@ -381,8 +380,7 @@ public class ChangeForgotPasswordPage {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) { // Check if Enter key is pressed
                     resetPasswordButton.doClick(); // Simulate click on the resetPasswordButton button
                 }
-            }
-            
+            }            
         });
         
         securityAnswerTxt.addKeyListener(new KeyAdapter() { // Add a key listener to the securityAnswerTxt textfield
@@ -634,7 +632,7 @@ public class ChangeForgotPasswordPage {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    } 
+    }
     
     
     // Method to check if the account is currently blocked due to too many failed login attempts

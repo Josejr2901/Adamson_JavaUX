@@ -212,11 +212,21 @@ public class securityQuestionDeleteProfile {
                             "Are you sure you want to delete your account? This action cannot be undone.",
                             "DeleteAccount", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
-                    if (response == JOptionPane.YES_OPTION) { // If the user confirms account deletion
+                    if (response == JOptionPane.NO_OPTION) {
+                        
+                       try {
+                        Files.deleteIfExists(Paths.get("delete_user_lock_status.txt"));
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                        } 
+                    }                  
+                                        
+                    else if (response == JOptionPane.YES_OPTION) { // If the user confirms account deletion
                         deleteUserData(currentEmail, username); // Delete usr data
 
                         try {
                             Files.deleteIfExists(Paths.get("session.txt")); // Delete the session file (logs the user out) 
+                            Files.deleteIfExists(Paths.get("delete_user_lock_status.txt"));
                         } catch (IOException ioException) {
                             ioException.printStackTrace(); // Print the error if the file detection fails
                         }
