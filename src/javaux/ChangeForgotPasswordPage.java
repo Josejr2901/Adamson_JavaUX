@@ -196,7 +196,7 @@ public class ChangeForgotPasswordPage {
                     return "Wrong email";
                 }
                 return null; // No issues found with the email
-            }            
+            }
         });
                 
         // Label to display validation icons for the email fields 
@@ -352,11 +352,6 @@ public class ChangeForgotPasswordPage {
                 
                 // Displaying a confirmatio dialog box to confirm ecisting without saving
                 int response = JOptionPane.showConfirmDialog(frame, "Do you want to exit without saving?", "Exit whithout saving", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                // frame /* The parent component for the dialog */
-                // "Do you want to exit without saving?" /* Message to display in the dialog */
-                // "Exit without saving" /* Title of the dialog window */
-                // JPtionPane.WES_NO_OPTION /* Dialog with Yes/No Option */
-                // JOptionPane.WARNING_MESSAGE /* Displays a warning icon */
                 
                 // Checking if the user clicked "Yes" to exit
                 if (response == JOptionPane.YES_OPTION) {

@@ -188,7 +188,7 @@ public class securityQuestionDeleteProfile {
 
                     JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for " + BLOCK_DURATION / 60000 + " minute(s)", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } else { // If the answer is correct
+            } else if (securityAnswer.equals(rightAnswer) && email.equals(currentEmail) && password.equals(currentPassword)){ // If the answer is correct
                 
                 failedAttempts = 0; // Reset the failed attempts counter
                 blockTime = 0;
@@ -560,7 +560,7 @@ public class securityQuestionDeleteProfile {
                         // If the lock duration has expired, reset the lock staus
                         failedAttempts = 0; // Resets the failed attempts counter
                         blockTime = 0; // Clears the block timestamp
-                        BLOCK_DURATION = 60000; // Sets the block duration to it's default value
+                        BLOCK_DURATION = savedBlockDuration; // Sets the block duration to stored value in the txt file
                         new File("delete_user_lock_status.txt").delete(); // Deletes the lock status file
                     }
                 }

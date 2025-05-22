@@ -149,7 +149,7 @@ public class MainPage extends Buttons {
             public void insertUpdate(DocumentEvent e) { // When the text is inserted
                 updateUsernameIconAndToolTip();         // Update the icon and tooltip based on input validity
             }
-
+            
             @Override
             public void removeUpdate(DocumentEvent e) { // When the text is removed 
                 updateUsernameIconAndToolTip();         // Update the icon and tooltip
@@ -176,7 +176,8 @@ public class MainPage extends Buttons {
                     usernameIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\IncorrectGold.png"));
                 }
             }
-
+            
+            // I get paid aroud .84 cents per hour for vacation 
             // Method to check if the entered username exists in the user data and return its status
             private String getUsernameStatus() {
                 String uNameStatus = usernameTxt.getText().trim(); // Get the trimmed text input 
@@ -189,7 +190,7 @@ public class MainPage extends Buttons {
                 return null; // If the username is valid, return null indicating no error
             }
         });
-                
+        
         usernameIcon = new JLabel(); 
         usernameIcon.setBounds(364, 100, 20, 20);
 
@@ -370,25 +371,41 @@ public class MainPage extends Buttons {
     // Method to load the account lock status from a file
     private void loadLockStatus() {
         
-        File lockFile = new File("lock_status.txt");
-        if (lockFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(lockFile))) {
-                String line = reader.readLine();
-                if (line != null) {
-                    String[] parts = line.split(",");
-                    if (parts.length == 4) {
-                        String usernameFromFile = parts[0];
-                        blockTime = Long.parseLong(parts[1]);
-                        BLOCK_DURATION = Long.parseLong(parts[2]);
-                        failedAttempts = Integer.parseInt(parts[3]);  
+        // Opens the file "lock_status.txt" for reading isomg a BufferedReader
+        try (BufferedReader reader = new BufferedReader(new FileReader("lock_status.txt"))) {
+            
+            String line = reader.readLine(); // Reads the first line of the file
+            
+            if (line != null) { // Check if the file contains data
+                String[] parts = line.split(",");
+                
+                if (parts.length >= 3) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                    String lockedUser = parts[0]; // Extracts  the username that was locked
+                    long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value 
+                    int savedBlockDuration = Integer.parseInt(parts[2]);
+                    int savedFailedAttempts = Integer.parseInt(parts[3]);
+                    
+                    // Check if the lock duration has not yet expired
+                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
+                        blockTime = lockedTime; // Updates the blockTime with the stored lock timestamp
+                        failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to the maximum limit
+                        BLOCK_DURATION = savedBlockDuration;
+                        failedAttempts = savedFailedAttempts;
+                    } else {
+                        // If the lock duration has expired, reset the lock status
+                        failedAttempts = 0; // Reset the failed Attempts counter // I can use stored failedAttempts and every 3 value lock it idk
+                        blockTime = 0; // Clears the block timestamp
+                        BLOCK_DURATION = savedBlockDuration; // sets the block duration to the stored value in the txt file
+                        new File("lock_status.txt").delete(); // Deletes the lock status file
                     }
                 }
-            } catch (IOException | NumberFormatException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            // Catches and prints an error message if there is an issue reading the file
+            e.printStackTrace();
         }
     }
-
+    
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
         
@@ -658,3 +675,5 @@ public class MainPage extends Buttons {
         loadUserData(); // Reload the user data to ensure it's up-to-date
     }
 }
+
+// Create a file just for the failed attempts that has to be updated every time a new attempt pf login is done unsuccessful 

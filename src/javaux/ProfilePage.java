@@ -227,5 +227,5 @@ public class ProfilePage {
             // Set the profilePictureButton's icon to null (no icon)
             profilePictureButton.setIcon(null);
         }
-    }    
+    }
 }
