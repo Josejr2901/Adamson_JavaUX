@@ -379,7 +379,7 @@ public class MainPage extends Buttons {
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(",");
                 
-                if (parts.length >= 3) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                if (parts.length == 4) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
                     String lockedUser = parts[0]; // Extracts  the username that was locked
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value 
                     int savedBlockDuration = Integer.parseInt(parts[2]);
@@ -618,7 +618,7 @@ public class MainPage extends Buttons {
             return null;
         }
     }
-    
+        
     // Decrypt method with IV
     public static String decryptData(String encryptedData) {
         try {
@@ -674,6 +674,7 @@ public class MainPage extends Buttons {
         System.out.println("Login information refreshed!");
         loadUserData(); // Reload the user data to ensure it's up-to-date
     }
-}
+    
+ }
 
 // Create a file just for the failed attempts that has to be updated every time a new attempt pf login is done unsuccessful 

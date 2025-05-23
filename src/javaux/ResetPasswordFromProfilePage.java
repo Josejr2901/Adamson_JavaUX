@@ -497,10 +497,11 @@ public class ResetPasswordFromProfilePage {
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(","); // Splits the line into an array using a coma as a delimeter
                 
-                if (parts.length == 3) {  // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                if (parts.length == 4) {  // Ensures the file contains exactly 2 parts (username and lock timestamp)
                     String lockedUser = parts[0]; // Extracts the username that was locked
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);
+                    int savedFailedAttempts = Integer.parseInt(parts[3]);
 
                     // Check if the lock duration has not yet expired
                     if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
@@ -511,7 +512,7 @@ public class ResetPasswordFromProfilePage {
                         // If the lock duration has expired, reset the lock status
                         failedAttempts = 0; // Resets the failed attempts counter
                         blockTime = 0; // Clearks the block timestamp
-                        BLOCK_DURATION = 60000; // Sets the block duration to it's default value
+                        BLOCK_DURATION = savedBlockDuration; // Sets the block duration to it's default value
                         new File("lock_reset_password_status.txt").delete(); // Deletes the lock status file 
                     }
                 }
@@ -526,7 +527,7 @@ public class ResetPasswordFromProfilePage {
         
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status.txt"))) {
-            writer.write(username + "," + blockTime + "," + BLOCK_DURATION);         
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);         
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue creating the file
             e.printStackTrace();

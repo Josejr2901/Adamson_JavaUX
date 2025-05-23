@@ -111,7 +111,7 @@ public class SecurityQuestionLogInPage {
                 // If the password is incorrect and the maximum attempts have been reached already
                 } else {
                     // If the password is incorrect but the maximum attempts have not been reached yet
-                    JOptionPane.showMessageDialog(frame, "Invalid Password. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts), "Warning", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Invalid Security Question. Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts), "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             }
                 else { // This statement is in case both the username and password entered by the user are correct and do exist in the HashMap
@@ -250,10 +250,11 @@ public class SecurityQuestionLogInPage {
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(","); // Splits the line into an array using comma as delimeter
                 
-                if (parts.length == 3) { // Ensures the file contains exactly 3 parts (username, locked time, and block duration)
+                if (parts.length == 4) { // Ensures the file contains exactly 3 parts (username, locked time, and block duration)
                     String lockedUser = parts[0]; // Extracts the username that was locked
                     long lockedTime = Long.parseLong(parts[1]); // converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);  // Read saved block duration
+                    int savedFailedAttempts = Integer.parseInt(parts[3]);
                     
                     // If lock duration is still active, apply it (Check if the lock duration has not yet expired)
                     if ((lockedTime + BLOCK_DURATION) > System.currentTimeMillis()) {
@@ -264,7 +265,7 @@ public class SecurityQuestionLogInPage {
                         // If the lock duration expires, reset lock status
                         failedAttempts = 0; // Resets the failed attempts counter
                         blockTime = 0; // Clears the block timestamp
-                        BLOCK_DURATION = 60000; // Sets BLOCK_DURATION to 60 seconds (1 min)
+                        BLOCK_DURATION = savedBlockDuration; // Sets BLOCK_DURATION to 60 seconds (1 min)
                         new File("security_Question_lock_status.txt").delete();
                     }
                 }
@@ -280,7 +281,7 @@ public class SecurityQuestionLogInPage {
         
         // Opens the file "security_Question_lock_stauts.txt" for writing using a BufferedWriter
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("security_Question_lock_status.txt"))) { 
-            writer.write(username + "," + blockTime + "," + BLOCK_DURATION); // Save username, lock time, and block duration
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts); // Save username, lock time, and block duration
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue writinf to a file
             e.printStackTrace();
