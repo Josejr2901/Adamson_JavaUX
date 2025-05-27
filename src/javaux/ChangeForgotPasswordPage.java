@@ -510,12 +510,19 @@ public class ChangeForgotPasswordPage {
     }
     
     private void saveLockStatus(String username, long blockTime) {
+       
+        File lockForgotPassword = new File("lock_forgot_passord_reset_status.txt");
+
         // Opens the file "lock_forgot_password_reset_status.txt"
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_forgot_password_reset_status.txt"))) {
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);
         } catch (IOException e) {
             //Catches and prints an error message if there is an issue creating the file
             e.printStackTrace();
+        }
+        
+        if (!lockForgotPassword.setReadOnly()) {
+            System.out.println("Warning: Unable to tranfrom");
         }
     }
     
@@ -623,6 +630,10 @@ public class ChangeForgotPasswordPage {
             // Replace the original file with the updated file
             if (file.delete()) {
                 tempFile.renameTo(file);
+            }
+            
+            if (!file.setReadOnly()) {
+                System.out.println("Warning: Unable to set file to Read Only");
             }
 
         } catch (IOException e) {

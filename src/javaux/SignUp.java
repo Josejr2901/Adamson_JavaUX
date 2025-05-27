@@ -835,8 +835,10 @@ public class SignUp {
                 //String encryptedBirthday = encryptData(birthday); // Encrypt the birthday
                 String encryptedGender = encryptData(gender); // Encrypt the gender
 
+                File userDataFile = new File("user_data.txt");
+                
                 // Attempt to write encrypted user data to file
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter("user_data.txt", true))) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(userDataFile, true))) {
                     writer.write(encryptedUsername + "," + encryptedEmail + "," + encryptedPassword + "," + encryptedQuestion + "," + encryptedAnswer + "," + encryptedBirthday + "," +encryptedGender); // Write user data
                     writer.newLine(); // add a new line after the data
                     JOptionPane.showMessageDialog(frame, "Sign up successful!"); 
@@ -845,6 +847,11 @@ public class SignUp {
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(frame, "Error saving data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
+                
+                if (!userDataFile.setReadOnly()) {
+                    System.out.println("Warning: Unable to transfor the 'user_data.txt' File to a Read-Only");
+                }
+                
                 frame.dispose();
                 new MainPage(new HashMap<>()); // Create a new instance of the main page
                 }

@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -86,8 +87,16 @@ public class LoggedInPage {
             
             // Clear the session file upon logout
             try {
+                File sessionFile = new File("session.txt");
+                
                 // Delete the "session.txt" in a text file if it exists, effectively loggin out the user
+                // If the file is read-only, make it writable again first
+                if (sessionFile.exists() && !sessionFile.canWrite()) {
+                    sessionFile.setWritable(true);
+                }
+                
                 Files.deleteIfExists(Paths.get("session.txt"));  // Delete the session file
+                
             } catch (IOException ioException) {
                 // Print an error stack trafe in case the file delefetc
                 ioException.printStackTrace();

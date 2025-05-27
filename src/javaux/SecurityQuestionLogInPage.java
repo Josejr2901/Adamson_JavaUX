@@ -279,13 +279,20 @@ public class SecurityQuestionLogInPage {
     // Method to save the lock status of an account. This is to preserve the lockout information even after the program is closed
     private void saveLockStatus(String username, long blockTime) {
         
+        File securityQuestionLockStatusFile = new File("security_Question_lock_status.txt");
+        
         // Opens the file "security_Question_lock_stauts.txt" for writing using a BufferedWriter
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("security_Question_lock_status.txt"))) { 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(securityQuestionLockStatusFile))) { 
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts); // Save username, lock time, and block duration
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue writinf to a file
             e.printStackTrace();
         }
+        
+        if (!securityQuestionLockStatusFile.setReadOnly()){
+            System.out.println("Warnin: Unable to transform file to Read Only");
+        }
+        
     }
     
 }

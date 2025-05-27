@@ -525,13 +525,20 @@ public class ResetPasswordFromProfilePage {
     
     private void saveLockStatus(String username, long blockTime) {
         
+        File lockResetPasswordStatusFile = new File("lock_reset_password_status.txt");
+        
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(lockResetPasswordStatusFile))) {
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);         
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue creating the file
             e.printStackTrace();
         }
+        
+        if (!lockResetPasswordStatusFile.setReadOnly()) {
+            System.out.println("Warning: Unable to transform file to Read Only");
+        }
+        
     }
     
     // Action listener for toggling the visibility of the password field

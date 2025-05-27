@@ -725,6 +725,11 @@ public class EditProfilePage {
                 if (file.delete()) {
                     tempFile.renameTo(file);
                 }
+                
+                if (!file.setReadOnly()) {
+                    System.out.println("Warning: Unable to tranform file to Read Only");
+                }
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }

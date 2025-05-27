@@ -574,12 +574,19 @@ public class securityQuestionDeleteProfile {
     // Method to save the lock status of a user to a fil. This is to prevent the lockout information even after the program is closed 
     private void saveLockStatus(String username, long blockTime) {
         
+        File deleteUserLockStatusFile = new File("delete_user_lock_status.txt");
+        
         // Opens the file "delete_user_lock_status.txt" for writing using a BufferedWriter
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("delete_user_lock_status.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(deleteUserLockStatusFile))) {
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION); // Writes the username and block timestamp, separated by comma
         } catch (IOException e) {
             // Catches and prints an enrror message if there is an issue writing to a file
             e.printStackTrace();
+            return;
+        }
+        
+        if (!deleteUserLockStatusFile.setReadOnly()) {
+            System.out.println("Warning: Unable to set file to read-only");
         }
     }
     
