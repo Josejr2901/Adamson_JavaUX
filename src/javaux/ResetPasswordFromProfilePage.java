@@ -23,7 +23,7 @@ import java.io.*; // Includes all Java I/O classes for reading files, streams, a
 import java.util.Base64; // Provides methods for encoding and decoding Base64 data, commonly used in encryption 
 
 // Importing collections framework
-import java.util.HashMap; //
+import java.util.HashMap; 
 
 // Importing cryptographic classes for encryption and decryption
 import javax.crypto.Cipher;
@@ -525,20 +525,13 @@ public class ResetPasswordFromProfilePage {
     
     private void saveLockStatus(String username, long blockTime) {
         
-        File lockResetPasswordStatusFile = new File("lock_reset_password_status.txt");
-        
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(lockResetPasswordStatusFile))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status"))) {
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);         
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue creating the file
             e.printStackTrace();
         }
-        
-        if (!lockResetPasswordStatusFile.setReadOnly()) {
-            System.out.println("Warning: Unable to transform file to Read Only");
-        }
-        
     }
     
     // Action listener for toggling the visibility of the password field

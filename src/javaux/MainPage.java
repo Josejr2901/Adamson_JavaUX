@@ -527,18 +527,12 @@ public class MainPage extends Buttons {
                         String encryptedUsername = encryptData(username); // If it is selected then encrypt the entered username and store it as a String for later usage of it
                         String encryptedPassword = encryptData(password); // If it is selected then encrypt the entered password and store it as a String for later usage of it 
                         
-                        File sessionFile = new File("session.txt");
-                        
                         // Try-catch statement to save encrypted credentials to a file called "session.txt"
-                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(sessionFile))) { //BufferedWriter is a Java class write characters, arrays or strings to a file
+                        try (BufferedWriter writer = new BufferedWriter(new FileWriter("session.txt"))) { //BufferedWriter is a Java class write characters, arrays or strings to a file
                             writer.write(encryptedUsername + "\n" + encryptedPassword);
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
-                        }
-                        
-                        if (!sessionFile.setReadOnly()) {
-                            System.out.println("Warning: Unable to set file to Read Only");
-                        }
+                        }                        
                     }
                     
                     // After checking if the checkbox was selected, open a new frame and close the current frame.
@@ -550,16 +544,12 @@ public class MainPage extends Buttons {
         // Function to save the lock status of an account. This is to preserve the lockout information even after the program is closed
         private void saveLockStatus(String username, long blockTime) {
             
-            File lockFile = new File("lock_status.txt");
-            
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(lockFile))) {
+            //try (BufferedWriter writer = new BufferedWriter(new FileWriter(lockFile))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_status.txt"))) {
                 writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts); // Save username, lock time, and block duration
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
-            }
-            if (!lockFile.setReadOnly()) {
-                System.out.println("Warning: Unable to set file to Read Only");
             }
         }
     }
@@ -686,8 +676,5 @@ public class MainPage extends Buttons {
         // Logic to refresh the login information (e.g., reloading user data)
         System.out.println("Login information refreshed!");
         loadUserData(); // Reload the user data to ensure it's up-to-date
-    }
-    
+    }    
  }
-
-// Create a file just for the failed attempts that has to be updated every time a new attempt pf login is done unsuccessful 

@@ -87,14 +87,8 @@ public class LoggedInPage {
             
             // Clear the session file upon logout
             try {
-                File sessionFile = new File("session.txt");
                 
-                // Delete the "session.txt" in a text file if it exists, effectively loggin out the user
-                // If the file is read-only, make it writable again first
-                if (sessionFile.exists() && !sessionFile.canWrite()) {
-                    sessionFile.setWritable(true);
-                }
-                
+                // Delete the "session.txt" in a text file if it exists, effectively loggin out the user                
                 Files.deleteIfExists(Paths.get("session.txt"));  // Delete the session file
                 
             } catch (IOException ioException) {
