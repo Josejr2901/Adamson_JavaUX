@@ -24,8 +24,8 @@ public class SecurityQuestionLogInPage {
     // Constructor method for the Security Questuion Login page
     public SecurityQuestionLogInPage(User user) {
         
-        loadLockStatus(); // Load lock status from file [if any]
-        loadFailedAttemptsStatus();
+        loadLockStatus(user); // Load lock status from file [if any]
+        loadFailedAttemptsStatus(user);
         
         // Extract used details
         String username = user.getUsername(); 
@@ -251,7 +251,9 @@ public class SecurityQuestionLogInPage {
     }
 
     // Method to load the account lock status from a file
-    private void loadLockStatus() {
+    private void loadLockStatus(User user) {
+        
+        String storedUsername = user.getUsername();
         
         // Opens the file "security_question_lock_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("security_question_lock_status.txt"))) {
@@ -266,17 +268,22 @@ public class SecurityQuestionLogInPage {
                     long lockedTime = Long.parseLong(parts[1]); // converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);  // Read saved block duration
                     
-                    // If lock duration is still active, apply it (Check if the lock duration has not yet expired)
-                    if ((lockedTime + BLOCK_DURATION) > System.currentTimeMillis()) {
-                        blockTime = lockedTime; // Restore block time
-                        failedAttempts = MAX_FAILED_ATTEMPTS; // Set to max to enformce lock
-                        BLOCK_DURATION = savedBlockDuration; // Restire saved block
+                    if (storedUsername.equals(lockedUser)) {
+                        // If lock duration is still active, apply it (Check if the lock duration has not yet expired)
+                        if ((lockedTime + BLOCK_DURATION) > System.currentTimeMillis()) {
+                            blockTime = lockedTime; // Restore block time
+                            failedAttempts = MAX_FAILED_ATTEMPTS; // Set to max to enformce lock
+                            BLOCK_DURATION = savedBlockDuration; // Restire saved block
+                        } else {
+                            // If the lock duration expires, reset lock status
+                            //failedAttempts = 0; // Resets the failed attempts counter
+                            blockTime = 0; // Clears the block timestamp
+                            BLOCK_DURATION = savedBlockDuration; // Sets BLOCK_DURATION to 60 seconds (1 min)
+                            new File("security_question_lock_status.txt").delete();
+                        }
                     } else {
-                        // If the lock duration expires, reset lock status
-                        //failedAttempts = 0; // Resets the failed attempts counter
-                        blockTime = 0; // Clears the block timestamp
-                        BLOCK_DURATION = savedBlockDuration; // Sets BLOCK_DURATION to 60 seconds (1 min)
-                        new File("security_question_lock_status.txt").delete();
+                        reader.close();
+                        return;
                     }
                 }
             }
@@ -287,7 +294,9 @@ public class SecurityQuestionLogInPage {
     }
     
     // Method to load the account failed attempts status from a file
-    private void loadFailedAttemptsStatus() {
+    private void loadFailedAttemptsStatus(User user) {
+        
+        String storedUsername = user.getUsername();
         
         // Opens the file "security_question_failed_attempts_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("security_question_failed_attempts_status.txt"))) {
@@ -301,11 +310,16 @@ public class SecurityQuestionLogInPage {
                     String failedAttemptUsername = parts[0];
                     int savedFailedAttempts = Integer.parseInt(parts[1]);
                     
-                    if (failedAttempts <= 3) {
-                        failedAttempts = savedFailedAttempts;
+                    if(storedUsername.equals(failedAttemptUsername)) {
+                        if (failedAttempts <= 3) {
+                            failedAttempts = savedFailedAttempts;
+                        } else {
+                            failedAttempts = 0;
+                            new File("security_question_failed_attempts_status.txt").delete();
+                        }
                     } else {
-                        failedAttempts = 0;
-                        new File("security_question_failed_attempts_status.txt").delete();
+                        reader.close();
+                        return;
                     }
                 }
             }

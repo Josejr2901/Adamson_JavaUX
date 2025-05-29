@@ -73,8 +73,8 @@ public class securityQuestionDeleteProfile {
     // Constructor method for the deleting a user profile with a security question
     public securityQuestionDeleteProfile(User user) {
         
-        loadLockStatus(); // Load the lock status of the user account to check if account is temporaly blocked
-        loadFailedAttemptsStatus();
+        loadLockStatus(user); // Load the lock status of the user account to check if account is temporaly blocked
+        loadFailedAttemptsStatus(user);
         
         // Retrieve user details from the User object
         String username = user.getUsername(); // Get the username        
@@ -546,7 +546,9 @@ public class securityQuestionDeleteProfile {
     }
 
     // Method to load the account lock status from a file
-    private void loadLockStatus() {
+    private void loadLockStatus(User user) {
+        
+        String currentUsername = user.getUsername();
         
         // Opens the file "delete_user_lock_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("delete_user_lock_status.txt"))) {
@@ -561,17 +563,23 @@ public class securityQuestionDeleteProfile {
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);
                     
-                    // Checks if the lock duration has not yet expired
-                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
-                        blockTime = lockedTime; // Updates the blockTime with the stored lock timestamp
-                        failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to the maximum limit
-                        BLOCK_DURATION = savedBlockDuration;
+                    if (lockedUser.equals(currentUsername)) {
+                    
+                        // Checks if the lock duration has not yet expired
+                        if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
+                            blockTime = lockedTime; // Updates the blockTime with the stored lock timestamp
+                            failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to the maximum limit
+                            BLOCK_DURATION = savedBlockDuration;
+                        } else {
+                            // If the lock duration has expired, reset the lock staus
+                            failedAttempts = 0; // Resets the failed attempts counter
+                            blockTime = 0; // Clears the block timestamp
+                            BLOCK_DURATION = savedBlockDuration; // Sets the block duration to stored value in the txt file
+                            new File("delete_user_lock_status.txt").delete(); // Deletes the lock status file
+                        }
                     } else {
-                        // If the lock duration has expired, reset the lock staus
-                        failedAttempts = 0; // Resets the failed attempts counter
-                        blockTime = 0; // Clears the block timestamp
-                        BLOCK_DURATION = savedBlockDuration; // Sets the block duration to stored value in the txt file
-                        new File("delete_user_lock_status.txt").delete(); // Deletes the lock status file
+                        reader.close();
+                        return;
                     }
                 }
             }
@@ -581,7 +589,9 @@ public class securityQuestionDeleteProfile {
         }
     }
     
-    private void loadFailedAttemptsStatus() {
+    private void loadFailedAttemptsStatus(User user) {
+        
+        String currentUsername = user.getUsername();
         
         // Opens the file "delete_user_failed_attempts_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("delete_user_failed_attempts_status.txt"))) {
@@ -590,21 +600,24 @@ public class securityQuestionDeleteProfile {
             
             if (line != null) {
                 String[] parts = line.split(","); // Splits the line into an array using comma as a delimeter
-                
+                                
                 if (parts.length == 2) { // Ensures the file contains exactly 2 parts (username and failedAttempts)
                     String failedAttemptsUsername = parts[0]; // Extracts the username that commited a failed attempt to login
                     int savedFailedAttempts = Integer.parseInt(parts[1]);
                     
-                    // Checks if the lock duration has not yet expired
-                    if (failedAttempts <= 3) {
-                        failedAttempts = savedFailedAttempts;
+                    if (failedAttemptsUsername.equals(currentUsername)) {
+                        // Checks if the lock duration has not yet expired
+                        if (failedAttempts <= 3) {
+                            failedAttempts = savedFailedAttempts;
+                        } else {
+                            failedAttempts = 0;
+                            new File("delete_user_failed_attempts_status.txt").delete();
+                        }
                     } else {
-                        failedAttempts = 0;
-                        new File("delete_user_failed_attempts_status.txt").delete();
+                        reader.close();
                     }
                 }
-            }
-            
+            }            
         } catch (IOException e) {
             e.printStackTrace();
         }

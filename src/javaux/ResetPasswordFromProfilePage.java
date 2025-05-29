@@ -62,8 +62,8 @@ public class ResetPasswordFromProfilePage {
     // Constructor for the ResetPasswordFromProfile class
     public ResetPasswordFromProfilePage(User user) {
         
-        loadLockStatus();
-        loadFailedAttemptsStatus();
+        loadLockStatus(user);
+        loadFailedAttemptsStatus(user);
         
         /* Retrieve user detail from user object */
         String currentSavedUsername = user.getUsername(); // Retrieve the username from the user object
@@ -498,33 +498,39 @@ public class ResetPasswordFromProfilePage {
     }
     
     // Method to load the lock status from a file
-    private void loadLockStatus() {
+    private void loadLockStatus(User user1) {               
         
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("lock_reset_password_status.txt"))) {
                       
+            String storedUsername = user1.getUsername();
+            
             String line = reader.readLine(); // Reads the first line of the file
                        
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(","); // Splits the line into an array using a coma as a delimeter
                 
-                if (parts.length == 4) {  // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                if (parts.length == 3) {  // Ensures the file contains exactly 2 parts (username and lock timestamp)
                     String lockedUser = parts[0]; // Extracts the username that was locked
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);
-                    int savedFailedAttempts = Integer.parseInt(parts[3]);
 
-                    // Check if the lock duration has not yet expired
-                    if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
-                        blockTime = lockedTime;  // Updates the blockTime with the stored lock timestamp
-                        failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to maximum limit
-                        BLOCK_DURATION = savedBlockDuration;
+                    if (storedUsername.equals(lockedUser)) {
+                        // Check if the lock duration has not yet expired
+                        if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
+                            blockTime = lockedTime;  // Updates the blockTime with the stored lock timestamp
+                            failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to maximum limit
+                            BLOCK_DURATION = savedBlockDuration;
+                        } else {
+                            // If the lock duration has expired, reset the lock status
+                            failedAttempts = 0; // Resets the failed attempts counter
+                            blockTime = 0; // Clearks the block timestamp
+                            BLOCK_DURATION = savedBlockDuration; // Sets the block duration to it's default value
+                            new File("lock_reset_password_status.txt").delete(); // Deletes the lock status file 
+                        }
                     } else {
-                        // If the lock duration has expired, reset the lock status
-                        failedAttempts = 0; // Resets the failed attempts counter
-                        blockTime = 0; // Clearks the block timestamp
-                        BLOCK_DURATION = savedBlockDuration; // Sets the block duration to it's default value
-                        new File("lock_reset_password_status.txt").delete(); // Deletes the lock status file 
+                        reader.close();
+                        return;
                     }
                 }
             }
@@ -534,10 +540,12 @@ public class ResetPasswordFromProfilePage {
         }
     }
     
-    private void loadFailedAttemptsStatus() {
+    private void loadFailedAttemptsStatus(User user1) {
         
         // Opens the file "failed_attempts_reset_password_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("failed_attempts_reset_password_status.txt"))) {
+            
+            String savedUsername = user1.getUsername();
             
             String line = reader.readLine(); // Reads the first line of the file
             
@@ -548,11 +556,16 @@ public class ResetPasswordFromProfilePage {
                     String failedAttemptsUsername = parts[0];
                     int savedFailedAttempts = Integer.parseInt(parts[1]);
                     
-                    if (failedAttempts <= 3) {
-                        failedAttempts = savedFailedAttempts;
+                    if(savedUsername.equals(failedAttemptsUsername)) {
+                        if (failedAttempts <= 3) {
+                            failedAttempts = savedFailedAttempts;
+                        } else {
+                            failedAttempts = 0;
+                            new File("failed_attempts_reset_password_status.txt").delete();
+                        }
                     } else {
-                        failedAttempts = 0;
-                        new File("failed_attempts_reset_password_status.txt").delete();
+                        reader.close();
+                        return;
                     }
                 }
             }
@@ -565,7 +578,7 @@ public class ResetPasswordFromProfilePage {
         
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status.txt"))) {
-            writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);         
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION);         
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue creating the file
             e.printStackTrace();
