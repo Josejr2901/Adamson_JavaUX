@@ -63,6 +63,7 @@ public class ResetPasswordFromProfilePage {
     public ResetPasswordFromProfilePage(User user) {
         
         loadLockStatus();
+        loadFailedAttemptsStatus();
         
         /* Retrieve user detail from user object */
         String currentSavedUsername = user.getUsername(); // Retrieve the username from the user object
@@ -278,7 +279,7 @@ public class ResetPasswordFromProfilePage {
             
             // Ensure new password and confirmation match
             if (!newPassword.equals(reEnterPassword)) {
-                JOptionPane.showMessageDialog(frame, "Password do not match", "Error", JOptionPane.ERROR_MESSAGE); 
+                JOptionPane.showMessageDialog(frame, "Password do not match", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             
@@ -292,6 +293,10 @@ public class ResetPasswordFromProfilePage {
                 JOptionPane.showMessageDialog(frame, "Invalid information entered, Attempts left: " + (MAX_FAILED_ATTEMPTS - failedAttempts - 1), "Warning", JOptionPane.WARNING_MESSAGE);
                 
                 failedAttempts++; // Increase the failed attempt counter
+                
+                if (failedAttempts <= 3) {
+                    saveFailedAttempts(currentSavedUsername);
+                }
                 
                 // Lock the account if the maximum number of failed attempts is reached
                 if(failedAttempts >= MAX_FAILED_ATTEMPTS) {
@@ -316,6 +321,12 @@ public class ResetPasswordFromProfilePage {
                     lockFile.delete(); 
                 }
                                 
+                File failedAttemptsFile = new File("failed_attempts_reset_password_status.txt"); 
+                    if (failedAttemptsFile.exists()) {
+                        failedAttemptsFile.delete();
+                    }
+                
+                
                 // Loads existing user data from file
                 HashMap<String, String> userData = loadUserData();
  
@@ -490,7 +501,7 @@ public class ResetPasswordFromProfilePage {
     private void loadLockStatus() {
         
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
-        try (BufferedReader reader = new BufferedReader (new FileReader("lock_reset_password_status.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("lock_reset_password_status.txt"))) {
                       
             String line = reader.readLine(); // Reads the first line of the file
                        
@@ -523,13 +534,49 @@ public class ResetPasswordFromProfilePage {
         }
     }
     
+    private void loadFailedAttemptsStatus() {
+        
+        // Opens the file "failed_attempts_reset_password_status.txt" for reading using a BufferedReader
+        try (BufferedReader reader = new BufferedReader(new FileReader("failed_attempts_reset_password_status.txt"))) {
+            
+            String line = reader.readLine(); // Reads the first line of the file
+            
+            if (line != null) {
+                String[] parts = line.split(","); // Splits the line into an array using a coma as a delimeter
+                
+                if (parts.length == 2) {
+                    String failedAttemptsUsername = parts[0];
+                    int savedFailedAttempts = Integer.parseInt(parts[1]);
+                    
+                    if (failedAttempts <= 3) {
+                        failedAttempts = savedFailedAttempts;
+                    } else {
+                        failedAttempts = 0;
+                        new File("failed_attempts_reset_password_status.txt").delete();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     private void saveLockStatus(String username, long blockTime) {
         
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_reset_password_status.txt"))) {
             writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);         
         } catch (IOException e) {
             // Catches and prints an error message if there is an issue creating the file
+            e.printStackTrace();
+        }
+    }
+    
+    private void saveFailedAttempts(String username) {
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed_attempts_reset_password_status.txt"))) {
+            writer.write(username + "," + failedAttempts);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

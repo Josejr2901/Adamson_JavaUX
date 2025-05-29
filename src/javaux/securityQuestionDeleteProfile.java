@@ -74,6 +74,7 @@ public class securityQuestionDeleteProfile {
     public securityQuestionDeleteProfile(User user) {
         
         loadLockStatus(); // Load the lock status of the user account to check if account is temporaly blocked
+        loadFailedAttemptsStatus();
         
         // Retrieve user details from the User object
         String username = user.getUsername(); // Get the username        
@@ -178,6 +179,10 @@ public class securityQuestionDeleteProfile {
                 
                 failedAttempts++; // Increase the failed attempt counter
 
+                if (failedAttempts <= 3) {
+                    saveFailedAttemptsStatus(username);
+                }
+                
                 // Lock the account if the maximum number of failed attempts is reached 
                 if(failedAttempts >= MAX_FAILED_ATTEMPTS) {
                     blockTime = System.currentTimeMillis(); // Record the lock time
@@ -197,6 +202,11 @@ public class securityQuestionDeleteProfile {
                 File lockFile = new File("delete_user_locked_status.txt");
                 if (lockFile.exists()) {
                     lockFile.delete();
+                }
+                
+                File failedAttemptsFile = new File("delete_user_failed_attempts_status.txt");
+                if (failedAttemptsFile.exists()) {
+                    failedAttemptsFile.delete();
                 }
                 
                 // Load user data from the database or file
@@ -570,8 +580,37 @@ public class securityQuestionDeleteProfile {
             e.printStackTrace();
         }
     }
+    
+    private void loadFailedAttemptsStatus() {
+        
+        // Opens the file "delete_user_failed_attempts_status.txt" for reading using a BufferedReader
+        try (BufferedReader reader = new BufferedReader(new FileReader("delete_user_failed_attempts_status.txt"))) {
+            
+            String line = reader.readLine(); // Reads the first line of the file
+            
+            if (line != null) {
+                String[] parts = line.split(","); // Splits the line into an array using comma as a delimeter
+                
+                if (parts.length == 2) { // Ensures the file contains exactly 2 parts (username and failedAttempts)
+                    String failedAttemptsUsername = parts[0]; // Extracts the username that commited a failed attempt to login
+                    int savedFailedAttempts = Integer.parseInt(parts[1]);
+                    
+                    // Checks if the lock duration has not yet expired
+                    if (failedAttempts <= 3) {
+                        failedAttempts = savedFailedAttempts;
+                    } else {
+                        failedAttempts = 0;
+                        new File("delete_user_failed_attempts_status.txt").delete();
+                    }
+                }
+            }
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    // Method to save the lock status of a user to a fil. This is to prevent the lockout information even after the program is closed 
+    // Method to save the lock status of an user. This is to preserve the lockout information even after the program is closed 
     private void saveLockStatus(String username, long blockTime) {
         
         // Opens the file "delete_user_lock_status.txt" for writing using a BufferedWriter
@@ -580,8 +619,19 @@ public class securityQuestionDeleteProfile {
         } catch (IOException e) {
             // Catches and prints an enrror message if there is an issue writing to a file
             e.printStackTrace();
-            return;
-        }        
+        }
+    }
+    
+    // Method to save the failed Attempts status of an account. This is to preserve the failed attempts information of an accout even after the program is closed
+    private void saveFailedAttemptsStatus(String username) {
+        
+        // Opens the file "delete_user_failed_attempts_status.txt" for writing using a BufferedWriter
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("delete_user_failed_attempts_status.txt"))) {
+            writer.write(username + "," + failedAttempts); // Writes the username and the failed Attempts, separated by comma
+        } catch (IOException e) {
+            // Checks and prints an error message if there is an issue writing to a file
+            e.printStackTrace();
+        }
     }
     
 }

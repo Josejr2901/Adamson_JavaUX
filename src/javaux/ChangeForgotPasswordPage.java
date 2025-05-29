@@ -53,6 +53,7 @@ public class ChangeForgotPasswordPage {
     ChangeForgotPasswordPage(String username, String email, String securityQuestion, String answer) {
                
         loadLockStatus();
+        loadFailedAttemptsStatus();
         
         /* Retrieve user detail from user objkect */
         String currentSavedUsername = username;
@@ -282,6 +283,10 @@ public class ChangeForgotPasswordPage {
                 
                 failedAttempts++; // Increase the failed attempt counter
                 
+                if (failedAttempts <= 3) {
+                    saveFailedAttemptsStatus(currentSavedUsername);
+                }
+                
                 // Lock the account if the maximum number of failed attempts is reached
                 if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
                     blockTime = System.currentTimeMillis(); // Record the lock time
@@ -303,6 +308,11 @@ public class ChangeForgotPasswordPage {
                 if (lockFile.exists()) {
                     lockFile.delete();
                 }
+                
+                File failedAttemptsFile = new File("failed_attempts_password_reset_status.txt");
+                    if (failedAttemptsFile.exists()) {
+                        failedAttemptsFile.delete();
+                    }
                 
                 // Loads existing user data from file
                 HashMap<String, String> userData = loadUserData();
@@ -483,11 +493,10 @@ public class ChangeForgotPasswordPage {
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(","); // Splits the line into an array using a comma as a delimeter
                 
-                if (parts.length == 4) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
+                if (parts.length == 3) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
                     String lockedUser = parts[0]; // Extracts the username that was locked
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value
                     int savedBlockDuration = Integer.parseInt(parts[2]);
-                    int savedFailedAttempts = Integer.parseInt(parts[3]);
                     
                     // Check if the lock duration has not yet expired
                     if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
@@ -509,13 +518,53 @@ public class ChangeForgotPasswordPage {
         }
     }
     
+    // Method to load failed Attempts status from a file
+    private void loadFailedAttemptsStatus() {
+        
+        // Opens the file "failed_attempts_password_reset_status.txt" for reading using a BufferedReader
+        try (BufferedReader reader = new BufferedReader(new FileReader("failed_attempts_password_reset_status.txt"))) {
+            
+            String line = reader.readLine(); // Reads the first line of the file
+            
+            if (line != null) { // Check if the file contains data
+                String[] parts = line.split(","); // Splits the line into an array using a comma as a delimeter
+                
+                if (parts.length == 2) {
+                    String lockedUserUsername = parts[0];
+                    int savedFailedAttempts = Integer.parseInt(parts[1]);
+                
+                    // Check if 
+                    if (failedAttempts <= 3) {
+                        failedAttempts = savedFailedAttempts;
+                    } else {
+                        failedAttempts = 0;
+                        new File("failed_attempts_password_reset_status.txt").delete();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // Cathes and prints an error message if there is an issue regarding the file
+            e.printStackTrace();
+        }
+    }
+    
     private void saveLockStatus(String username, long blockTime) {
 
         // Opens the file "lock_forgot_password_reset_status.txt"
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_forgot_password_reset_status.txt"))) {
-            writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts);
+            writer.write(username + "," + blockTime + "," + BLOCK_DURATION);
         } catch (IOException e) {
             //Catches and prints an error message if there is an issue creating the file
+            e.printStackTrace();
+        }
+    }
+    
+    private void saveFailedAttemptsStatus(String username) {
+    
+        // Opens the file "failed_attempts_password_reset_status.txt"
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed_attempts_password_reset_status.txt"))) {
+            writer.write(username + "," + failedAttempts);
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }
@@ -624,10 +673,6 @@ public class ChangeForgotPasswordPage {
             // Replace the original file with the updated file
             if (file.delete()) {
                 tempFile.renameTo(file);
-            }
-            
-            if (!file.setReadOnly()) {
-                System.out.println("Warning: Unable to set file to Read Only");
             }
 
         } catch (IOException e) {

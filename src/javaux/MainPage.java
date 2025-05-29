@@ -371,7 +371,7 @@ public class MainPage extends Buttons {
     // Method to load the account lock status from a file
     private void loadLockStatus() {
         
-        // Opens the file "lock_status.txt" for reading isomg a BufferedReader
+        // Opens the file "lock_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("lock_status.txt"))) {
             
             String line = reader.readLine(); // Reads the first line of the file
@@ -379,21 +379,21 @@ public class MainPage extends Buttons {
             if (line != null) { // Check if the file contains data
                 String[] parts = line.split(",");
                 
-                if (parts.length == 4) { // Ensures the file contains exactly 2 parts (username and lock timestamp)
-                    String lockedUser = parts[0]; // Extracts  the username that was locked
+                if (parts.length == 3) { // Ensures the file contains exactly 3 parts (username and lock timestamp)
+                    String lockedUser = parts[0]; // Extracts  the username of the user that was locked
                     long lockedTime = Long.parseLong(parts[1]); // Converts the lock timestamp to a long value 
-                    int savedBlockDuration = Integer.parseInt(parts[2]);
-                    int savedFailedAttempts = Integer.parseInt(parts[3]);
+                    int savedBlockDuration = Integer.parseInt(parts[2]); // Retrieves and converts the block duration to an integer
+                    //int savedFailedAttempts = Integer.parseInt(parts[3]);
                     
                     // Check if the lock duration has not yet expired
                     if ((lockedTime + savedBlockDuration) > System.currentTimeMillis()) {
                         blockTime = lockedTime; // Updates the blockTime with the stored lock timestamp
                         failedAttempts = MAX_FAILED_ATTEMPTS; // Sets failed attempts to the maximum limit
                         BLOCK_DURATION = savedBlockDuration;
-                        failedAttempts = savedFailedAttempts;
+                        //failedAttempts = savedFailedAttempts;
                     } else {
                         // If the lock duration has expired, reset the lock status
-                        failedAttempts = 0; // Reset the failed Attempts counter // I can use stored failedAttempts and every 3 value lock it idk
+                        //failedAttempts = 0; // Reset the failed Attempts counter // I can use stored failedAttempts and every 3 value lock it idk
                         blockTime = 0; // Clears the block timestamp
                         BLOCK_DURATION = savedBlockDuration; // sets the block duration to the stored value in the txt file
                         new File("lock_status.txt").delete(); // Deletes the lock status file
@@ -406,10 +406,39 @@ public class MainPage extends Buttons {
         }
     }
     
+    // Method to load the failed attempts status of the account from a file
+    private void loadFailedAttemptsStatus() {
+        
+        // Opens the file "failed_attempts_status.txt for reading using a BufferedReader
+        try (BufferedReader reader = new BufferedReader(new FileReader("failed_attempts_status.txt"))) {
+            
+            String line = reader.readLine(); // Reads the first line of the file
+            
+            if (line != null) { // Check if the file contains data
+                String[] parts = line.split(","); 
+                
+                if (parts.length == 2) { // Ensures that the file contains exactly 2 parts (username and failed Attempts)
+                    String failedAttemptUser = parts[0]; // Extracts the username of the user that was lcoked
+                    int savedFailedAttempts = Integer.parseInt(parts[1]); // Retrieves and converts the failed Attempts to an integer
+                    
+                    if (savedFailedAttempts <= 3) {
+                        failedAttempts = savedFailedAttempts; 
+                    } else {
+                        failedAttempts = 0;
+                        new File("failed_attempts_status.txt").delete();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
         
         loadLockStatus(); // Load lockout status first to find out if the user is locked at the moment or not
+        loadFailedAttemptsStatus(); // Load failed attempts status first to find out how many times the user has attempted to login unsuccessfully 
         
         try (BufferedReader reader = new BufferedReader(new FileReader("user_data.txt"))) { // Open the "user_data.txt" file for reading
             String line; // Creates a variable that will temporarily hold the current line being read from the file
@@ -494,7 +523,15 @@ public class MainPage extends Buttons {
             } else if (user != null && password.isEmpty()) { // If the username exists but the password field is empty do the following
                 JOptionPane.showMessageDialog(frame, "Please enter the password to proceed", "Enter Password", JOptionPane.INFORMATION_MESSAGE);
             } else if (!user.getPassword().equals(password)) { // Comparing the password from the HashMap with the latest password entered by user
+                
                 failedAttempts++; // Increment failed attempts counter if user enters right username but wrong password
+                
+                //System.out.println("Number of failed Attempts: " + failedAttempts);
+                
+                // If statement that in case the failed attempts are equal or less than 3, it overrites the old value for the new one (From 1 to 2, etc)
+                if (failedAttempts <= 3) {
+                    saveFailedAttemptsStatus(username);
+                }
                 
                 // If statment in case the failed attempts reach the maximum, then the following will be done:
                 if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
@@ -521,6 +558,11 @@ public class MainPage extends Buttons {
                         if (lockFile.exists()) {
                             lockFile.delete();
                         }
+                        
+                        File failedAttemptsFile = new File("failed_attempts_status.txt"); 
+                        if (failedAttemptsFile.exists()) {
+                            failedAttemptsFile.delete();
+                        }
                     
                     // Statement to check if the checkbox is currently selected
                     if (checkBox.isSelected()) {
@@ -532,7 +574,7 @@ public class MainPage extends Buttons {
                             writer.write(encryptedUsername + "\n" + encryptedPassword);
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
-                        }                        
+                        }
                     }
                     
                     // After checking if the checkbox was selected, open a new frame and close the current frame.
@@ -544,12 +586,21 @@ public class MainPage extends Buttons {
         // Function to save the lock status of an account. This is to preserve the lockout information even after the program is closed
         private void saveLockStatus(String username, long blockTime) {
             
-            //try (BufferedWriter writer = new BufferedWriter(new FileWriter(lockFile))) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("lock_status.txt"))) {
-                writer.write(username + "," + blockTime + "," + BLOCK_DURATION + "," + failedAttempts); // Save username, lock time, and block duration
+                writer.write(username + "," + blockTime + "," + BLOCK_DURATION); // Save username, lock time, and block duration
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
+            }
+        }
+        
+        // Function to save the failed attempts status of an account. This is to preserve the failed attempts information even after the program is closed
+        private void saveFailedAttemptsStatus(String username) {
+            
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed_attempts_status.txt"))) {
+                writer.write(username + "," + failedAttempts); // Save username and failed attempts
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -621,7 +672,7 @@ public class MainPage extends Buttons {
             return null;
         }
     }
-        
+    
     // Decrypt method with IV
     public static String decryptData(String encryptedData) {
         try {
