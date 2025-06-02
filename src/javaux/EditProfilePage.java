@@ -485,7 +485,7 @@ public class EditProfilePage {
         if (userGender.equals("Male")) {
             // Set icon for male users
             genderIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\IconMaleGold16px.png"));
-        } 
+        }
         // Check if user is female
         else if (userGender.equals("Female")) {
             // Set icon for female users

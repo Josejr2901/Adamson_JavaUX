@@ -263,7 +263,7 @@ public class MainPage extends Buttons {
                 }
             }
         });
-                      
+        
         Buttons buttons = new Buttons();
         loginButton = new JButton("Log in");
         loginButton.setContentAreaFilled(false); // Disable default background behavior
@@ -433,6 +433,8 @@ public class MainPage extends Buttons {
             e.printStackTrace();
         }
     }
+    
+    // .45 x 24
     
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
@@ -727,5 +729,8 @@ public class MainPage extends Buttons {
         // Logic to refresh the login information (e.g., reloading user data)
         System.out.println("Login information refreshed!");
         loadUserData(); // Reload the user data to ensure it's up-to-date
-    }    
+    }
  }
+
+// Fix: When a lock_status file is created with one username info, if I failed to login with another account, the file will be overriden and the info of the last failed attempt will be erased, 
+// So I must find a way that when a new file is created it is just created with a extra character or something, so the file does not simply get overriden. Every user has it's own limited attempts 

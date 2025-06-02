@@ -124,7 +124,7 @@ public class ChangeForgotPasswordPage {
                 answerIcon.setToolTipText(answerStatus); // Set tooltip with validation message
                 
                 // Set appropiate icon based on the security answer validation
-                if (answerIcn.isEmpty()) { // No icon if emptu
+                if (answerIcn.isEmpty()) { // No icon if empty
                     answerIcon.setIcon(null); 
                 } else if (answerIcn.equalsIgnoreCase(answer)) { // CorrectGold icon if the answer entered by the user matches the answer saved in the text file
                     answerIcon.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\CorrectGold.png")); 
@@ -199,7 +199,7 @@ public class ChangeForgotPasswordPage {
                 return null; // No issues found with the email
             }
         });
-                
+        
         // Label to display validation icons for the email fields 
         emailIcon = new JLabel();
         emailIcon.setBounds(344, 170, 20, 20);
@@ -385,7 +385,7 @@ public class ChangeForgotPasswordPage {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) { // Check if Enter key is pressed
                     resetPasswordButton.doClick(); // Simulate click on the resetPasswordButton button
                 }
-            }            
+            }
         });
         
         securityAnswerTxt.addKeyListener(new KeyAdapter() { // Add a key listener to the securityAnswerTxt textfield
@@ -549,7 +549,7 @@ public class ChangeForgotPasswordPage {
                     } else {
                         reader.close();
                         return;
-                    }                                   
+                    }
                 }
             }
         } catch (IOException e) {

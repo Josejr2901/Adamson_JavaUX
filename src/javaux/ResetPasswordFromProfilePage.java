@@ -326,7 +326,6 @@ public class ResetPasswordFromProfilePage {
                         failedAttemptsFile.delete();
                     }
                 
-                
                 // Loads existing user data from file
                 HashMap<String, String> userData = loadUserData();
  
@@ -493,12 +492,12 @@ public class ResetPasswordFromProfilePage {
         frame.add(reEnterPasswordField);
         frame.add(passwordVisibleCB2);
         frame.add(resetPasswordButton);
-        frame.add(cancelButton);   
-        frame.setVisible(true);       
+        frame.add(cancelButton);
+        frame.setVisible(true);
     }
     
     // Method to load the lock status from a file
-    private void loadLockStatus(User user1) {               
+    private void loadLockStatus(User user1) {
         
         // Opens the file "lock_reset_password_status.txt" for reading using a BufferedReader
         try (BufferedReader reader = new BufferedReader(new FileReader("lock_reset_password_status.txt"))) {
@@ -623,7 +622,7 @@ public class ResetPasswordFromProfilePage {
              }
         }
     }
-             
+    
     // Method to lead user data from "user_data.txt" file
     private HashMap<String, String> loadUserData() {
         HashMap<String, String> userData = new HashMap<>();
@@ -684,7 +683,6 @@ public class ResetPasswordFromProfilePage {
                     } else {
                         writer.write(line);
                     }
-                    
                 } else {
                     // Write unchanged lines to the temporary file
                     writer.write(line);
