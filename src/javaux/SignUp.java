@@ -845,7 +845,7 @@ public class SignUp {
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(frame, "Error saving data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                                
+                
                 frame.dispose();
                 new MainPage(new HashMap<>()); // Create a new instance of the main page
                 }

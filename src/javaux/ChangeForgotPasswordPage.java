@@ -298,7 +298,7 @@ public class ChangeForgotPasswordPage {
                     JOptionPane.showMessageDialog(frame, "Too many failed attempts. This action is locked for " + BLOCK_DURATION / 60000 + " minute(s)", "Error", JOptionPane.ERROR_MESSAGE);                    
                 }
             }
-                        
+            
             else {
                 failedAttempts = 0;
                 blockTime = 0;
@@ -593,7 +593,7 @@ public class ChangeForgotPasswordPage {
             }
         }
     }
-    
+       
     // Action listener for toggling the visibility of the password field
     public class PasswordVisible2 implements ActionListener {
         @Override

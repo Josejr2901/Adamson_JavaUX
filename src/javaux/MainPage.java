@@ -434,8 +434,6 @@ public class MainPage extends Buttons {
         }
     }
     
-    // .45 x 24
-    
     // This method loads user data from "user_data.txt", decrypts it, and stores it in the HashMap (userData)
     private void loadUserData() {
         
@@ -496,7 +494,7 @@ public class MainPage extends Buttons {
             }
         }
     }
-    
+        
     // Class to handle login button click events
     private class LogInAction implements ActionListener {
         @Override
@@ -645,7 +643,7 @@ public class MainPage extends Buttons {
             e.printStackTrace();
         }
         return null; // No session or invalid session
-}
+    }
 
     /* AES Encryption method and Decryption Methods */
     

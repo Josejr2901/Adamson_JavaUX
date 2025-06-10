@@ -46,7 +46,7 @@ public class SecurityQuestionLogInPage {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-               try{
+               try {
                    // Delete the session file when the window is closed
                    Files.deleteIfExists(Paths.get("session.txt"));
                } catch (IOException ioException) {
@@ -95,7 +95,7 @@ public class SecurityQuestionLogInPage {
                 JOptionPane.showMessageDialog(frame, "Account is locked. Please try again in " + minutes + " minute(s) and " + seconds + " second(s)", "Wait", JOptionPane.INFORMATION_MESSAGE);
                 return; // Exit the function, preventing further login attempts
             }
-                        
+            
             if (securityAnswer.isEmpty()) { // Check if answer is empty
                 JOptionPane.showMessageDialog(frame, "Please enter the answer to proceed", "Enter an answer", JOptionPane.INFORMATION_MESSAGE);
             } else if (!securityAnswer.equals(answer)) { // Check if the entered answer matches the correct answer
@@ -135,7 +135,7 @@ public class SecurityQuestionLogInPage {
                     if (failedAttemptsFile.exists()) {
                         failedAttemptsFile.delete();
                     }
-                              
+                    
                     // After checking if the checkbox was selected, open a new frame and close the current frame.
                     frame.dispose();
                     new LoggedInPage(user);

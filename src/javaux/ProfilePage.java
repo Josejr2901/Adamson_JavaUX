@@ -214,7 +214,7 @@ public class ProfilePage {
         if (userGender.equals("Male")) {
             // If the user is male, set the profilePictureButton's icon to a white background male profile picture
             profilePictureButton.setIcon(new ImageIcon("C:\\Users\\Jose.m\\Documents\\NetBeansProjects\\JavaUX\\src\\profilePictureMaleWhite.png"));
-        } 
+        }
         
         // Check if the user's gender is "Female"
         else if (userGender.equals("Female")) {

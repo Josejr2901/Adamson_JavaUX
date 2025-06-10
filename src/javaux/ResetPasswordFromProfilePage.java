@@ -23,7 +23,7 @@ import java.io.*; // Includes all Java I/O classes for reading files, streams, a
 import java.util.Base64; // Provides methods for encoding and decoding Base64 data, commonly used in encryption 
 
 // Importing collections framework
-import java.util.HashMap; 
+import java.util.HashMap;
 
 // Importing cryptographic classes for encryption and decryption
 import javax.crypto.Cipher;
